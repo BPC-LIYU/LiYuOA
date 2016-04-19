@@ -47,25 +47,16 @@ class ValuesQuerySet(models.QuerySet):
         ex_parms.extend(self.model.Meta.detail_json)
         return self.list_json(ex_parms, un_parms)
 
-    def serializer(self, start_index, end_index):
-        """
-        序列化 obj
-        by:王健 at:2016-04-19
-        :param start_index:
-        :param end_index:
-        :return:
-        """
-        return self[start_index:end_index]
-
     def get_serializer(self):
         """
         序列化 obj
         by:王健 at:2016-04-19
-        :param start_index:
-        :param end_index:
         :return:
         """
-        return self.detail_json()[0]
+        try:
+            return self.detail_json()[0]
+        except IndexError:
+            raise self.model.DoesNotExist()
 
     def get_or_create_serializer(self, **kwargs):
         """
@@ -77,7 +68,7 @@ class ValuesQuerySet(models.QuerySet):
         obj = self.detail_json().filter(pk=obj.pk)[0]
         return obj, created
 
-    def page_obj_query(self, page_index, page_size):
+    def get_page(self, page_index, page_size):
         """
         直接对 query_set进行分页
         by:王健 at:2016-04-19

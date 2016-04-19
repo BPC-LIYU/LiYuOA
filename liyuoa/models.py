@@ -3,9 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 # Create your models here.
-from util.basemodel import BaseModel
-from util.tools import getUserIconUrl
-from django.conf import settings
+from util.basemodel import BaseModel, ValuesQuerySet
 
 
 class LYUser(AbstractUser):
@@ -19,6 +17,8 @@ class LYUser(AbstractUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
+
+    objects = ValuesQuerySet.as_manager()
 
     class Meta:
         list_json = ['realname', 'icon_url', 'id']
