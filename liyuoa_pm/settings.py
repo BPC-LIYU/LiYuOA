@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'liyuoa',
+    'liyu_organization',
 )
 
 MIDDLEWARE_CLASSES = (

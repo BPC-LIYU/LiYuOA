@@ -1,4 +1,26 @@
-# coding=utf-8
+#!/usr/bin/env python
+# encoding: utf-8
+# Date: 16/4/19 下午8:44
+# file:appinfo_sync_tools.py
+# Email: wangjian2254@icloud.com
+# Author: 王健
+from django.conf import settings
+from django.core.management import BaseCommand
+import importlib
+
+from util.tools import common_except_log
+
+
+class Command(BaseCommand):
+
+    def handle(self, *args, **options):
+        for app in settings.INSTALLED_APPS:
+            try:
+                m = importlib.importmodule("%s.app_config" % app)
+                sync_app_info_and_role(m.used_app, m.APP_NAMESPACE)
+                print app, u': sync success'
+            except:
+                common_except_log()
 
 
 def sync_app_info_and_role(used_app, APP_NAMESPACE):
