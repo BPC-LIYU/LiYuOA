@@ -99,9 +99,9 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-cn'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -144,8 +144,6 @@ USER_ICON_BG_COLORS = [
     '#f98463',
     '#f9c01c',
 ]
-KNOWN_FILE_TYPE = ['doc', 'docx', 'file', 'pdf', 'ppt', 'pptx', 'xls', 'xlsx']
-FILE_TYPE_BASE_URL = "http://7xlb6q.com2.z0.glb.qiniucdn.com/sys/file/"
 
 
 # **********************************************************
@@ -163,7 +161,7 @@ if os.path.exists(etc_path):
     except Exception, e:
         print e
 elif ENVIRONMENT:
-    settings_path = os.path.join(BASE_DIR, 'Need_Server', 'settings_%s.py' % ENVIRONMENT)
+    settings_path = os.path.join(BASE_DIR, 'liyuoa_pm', 'settings_%s.py' % ENVIRONMENT)
     if os.path.exists(settings_path):
         file = open(settings_path, 'r')
         text = file.read()
