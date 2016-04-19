@@ -31,13 +31,32 @@ class LYUser(AbstractUser):
 class AppInfo(BaseModel):
     """
     应用信息
-    by:范俊伟 at:2015-10-09
+    by:王健 at:2015-10-09
     """
     flag = models.CharField(max_length=50, unique=True, null=True, verbose_name=u'功能标记')
     name = models.CharField(max_length=20, verbose_name=u"应用名称")
     type_flag = models.CharField(max_length=20, verbose_name=u'应用类型')
+    is_show = models.BooleanField(default=True, verbose_name=u'是否显示在应用列表')
+    desc = models.TextField(blank=True, verbose_name=u'应用描述')
+    namespace = models.CharField(max_length=20, db_index=True, blank=True, verbose_name=u'应用描述')
 
     class Meta:
         list_json = ['flag', 'name', 'id', 'type_flag']
+        detail_json = ['create_time', 'is_active', 'desc']
+
+
+class AppRole(BaseModel):
+    """
+    应用内角色信息
+    by:王健 at:2015-10-09
+    """
+    role = models.CharField(max_length=20, verbose_name=u'角色')
+    name = models.CharField(max_length=20, verbose_name=u"角色名称")
+    desc = models.TextField(blank=True, verbose_name=u'应用描述')
+    app = models.ForeignKey(AppInfo)
+
+    class Meta:
+        unique_together = (("role", "app"),)
+        list_json = ['role', 'name', 'id', 'desc']
         detail_json = ['create_time', 'is_active']
 

@@ -20,13 +20,14 @@ def app_power_permissions(app_flag, org_id, role=['user'], message=u'您不具�
             permissions_data = request.session['permissions_data']
             if permissions_data is None:
                 permissions_data = {}
-                for permission in Permissions.objects.filter(person__user=request.user, person__is_active=True,
-                                                             org_id=org_id, app__is_active=True).select_related('app'):
+                for permission in Permissions.objects.filter(person__user=request.user, is_active=True,
+                                                             person__is_active=True, org_id=org_id,
+                                                             app__is_active=True, role__is_active=True).select_related('app', 'role'):
                     if not permissions_data.has_key(permission.org_id):
                         permissions_data[permission.org_id] = {}
                     if not permissions_data[permission.org_id].has_key(permission.app.flag):
                         permissions_data[permission.org_id][permission.app.flag] = []
-                    permissions_data[permission.org_id][permission.app.flag].append(permission.role)
+                    permissions_data[permission.org_id][permission.app.flag].append(permission.role.role)
                 request.session['permissions_data'] = permissions_data
                 request.session.save()
             current_org_id = int(org_id)

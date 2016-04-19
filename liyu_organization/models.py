@@ -101,11 +101,11 @@ class Permissions(BaseModel):
     org = models.ForeignKey(Organization, verbose_name=u"隶属组织")
     person = models.ForeignKey(Person, verbose_name=u'用户')
     app = models.ForeignKey('liyuoa.AppInfo', verbose_name=u'应用')
-    role = models.CharField(max_length=20, db_index=True, verbose_name=u'角色')
+    role = models.ForeignKey('liyuoa.AppRole', verbose_name=u'应用')
 
     class Meta:
         unique_together = (("org", "user", "app"),)
 
-        list_json = ['org_id', 'app__name', 'app__flag', 'app__typeflag', 'id', 'role']
+        list_json = ['org_id', 'app__name', 'app__flag', 'app__typeflag', 'id', 'role__name', 'role_id']
         detail_json = ['create_time', 'is_active', 'person_id', 'person__user_id', 'person__realname',
-                       'person__user__icon_url']
+                       'person__user__icon_url', 'role__role', 'role__desc']
