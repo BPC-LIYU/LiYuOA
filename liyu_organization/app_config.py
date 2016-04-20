@@ -5,11 +5,11 @@
 # Email: wangjian2254@icloud.com
 # Author: 王健
 
-APP_NAMESPACE = 'liyu_organization'
+# APP_NAMESPACE = 'liyu_organization'
 
 
 class AppOrganization:
-    namespace = APP_NAMESPACE
+    # namespace = APP_NAMESPACE
     name = u'组织架构'
     flag = 'organization'
     type_flag = u'default'

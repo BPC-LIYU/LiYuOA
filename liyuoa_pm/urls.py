@@ -17,5 +17,8 @@ from django.conf.urls import include, url
 # from django.contrib import admin
 
 urlpatterns = [
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^nf/', include('nsbcs.urls')),
+    url(r'^cd/', include('clouddisk.urls')),
+    url(r'^org/', include('liyu_organization.urls')),
+    url(r'^sys/', include('liyuoa.urls')),
 ]

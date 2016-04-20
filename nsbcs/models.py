@@ -16,9 +16,13 @@ from util.basemodel import BaseModel
 from util.middleware import getHost
 
 __author__ = u'王健'
+
 from django.db import models
 
-qn_auth = qiniu.Auth(settings.QN_AK, settings.QN_SK)
+try:
+    qn_auth = qiniu.Auth(settings.QN_AK, settings.QN_SK)
+except:
+    pass
 
 NS_FILE_GROUP_TYPE_SYS = 0
 NS_FILE_GROUP_TYPE_USER = 1
@@ -208,25 +212,23 @@ class NsFile(BaseModel):
         return super(NsFile, self).save(*args, **kwargs)
 
     @staticmethod
-    def update_file_status(id, user=None, person=None, org=None):
+    def update_file_status(fileobj, user_id=None, person_id=None, org_id=None):
         """
         更新文件状态
         by:王健 at:2016-04-20
-        :param id:
-        :param user:
-        :param person:
-        :param org:
+        :param org_id:
+        :param person_id:
+        :param user_id:
+        :param fileobj:
         :return:
         """
 
-        for i in NsFile.objects.filter(pk=id):
-            i.file_status = True
-            if org:
-                i.org = org
-            if user:
-                i.user = user
-            if person:
-                i.person = person
-            i.save()
-            return i
+        fileobj.file_status = True
+        if org_id:
+            fileobj.org_id = org_id
+        if user_id:
+            fileobj.user_id = user_id
+        if person_id:
+            fileobj.person_id = person_id
+        fileobj.save()
 

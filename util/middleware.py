@@ -9,7 +9,8 @@ from django import http
 from django.conf import settings
 import pickle
 import time
-from needserver.models import NSUser
+
+from liyuoa.models import LYUser
 from util.tools import common_except_log
 from django.contrib import auth
 from django.utils.functional import SimpleLazyObject
@@ -147,7 +148,7 @@ class CustomAuthenticationMiddleware(object):
         :param response:
         :return:
         """
-        if hasattr(request, 'user') and isinstance(request.user, NSUser):
+        if hasattr(request, 'user') and isinstance(request.user, LYUser):
             user_pickle_timeline = request.session.get('user_pickle_timeline', 0)
             if not user_pickle_timeline:
                 try:

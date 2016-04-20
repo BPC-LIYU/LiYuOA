@@ -2,23 +2,21 @@
 # Date:2014/7/25
 # Email:wangjian2254@gmail.com
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import transaction
-
-__author__ = u'王健'
-
 import uuid
-
 from nsbcs.models import NsFile, NS_FILE_GROUP_TYPE_SYS, NS_FILE_GROUP_TYPE_USER, \
     NS_FILE_GROUP_TYPE_ORG
-
 from util.jsonresult import get_result
-
 from util.loginrequired import check_request_parmes
+
+__author__ = u'王健'
 
 
 def get_bucket_by_group_type(group_type):
     """
     根据类型获取存储空间
+    by:王健 at:2016-04-20
     :param group_type:
     :return:
     """
@@ -31,10 +29,16 @@ def get_bucket_by_group_type(group_type):
     return None
 
 
-@check_request_parmes(group_type=("group_type", "r"), filetype=("文件类型", "r"), filename=("文件名称", "r"))
+@check_request_parmes(group_type=("文件存储类型", "r"), filetype=("文件类型", "r"), filename=("文件名称", "r"))
 @transaction.atomic()
 def get_upload_files_url(request, group_type, filetype, filename):
     """
+    获取上传文件的url信息
+    :param filetype:
+    :param filename:
+    :param group_type:
+    :param request:
+    :return:
     获取上传地址
     by: 范俊伟 at:2015-08-28
     修改上传
@@ -45,11 +49,6 @@ def get_upload_files_url(request, group_type, filetype, filename):
     by: 范俊伟 at:2015-08-28
     文件类型处理
     by: 范俊伟 at:2015-08-28
-    :param filename:
-    :param filetype:
-    :param group_type:
-    :param request:
-    :return:
     """
     bucket = get_bucket_by_group_type(group_type)
     if bucket is None:
@@ -61,7 +60,7 @@ def get_upload_files_url(request, group_type, filetype, filename):
         fileobj.group_type = NS_FILE_GROUP_TYPE_USER
     elif group_type == "org":
         fileobj.group_type = NS_FILE_GROUP_TYPE_ORG
-    if isinstance(request.user, settings.AUTH_USER_MODEL):
+    if request.user.is_anonymous():
         fileobj.user = request.user
     fileobj.bucket = bucket
     fileobj.is_active = False
@@ -144,14 +143,18 @@ def formate_file_url(img_w, img_h, fileobjs):
                                                     fileobj['filetype'])
 
 
-@check_request_parmes(fileid=("文件ID", "r,[int]"))
-def upload_complete(request, fileid):
+@check_request_parmes(fileid=("文件ID", "r,[int]"), user_id=('用户', 'int'), person_id=('组织成员', 'int'),
+                      org_id=('组织', 'int'))
+def upload_complete(request, fileid, user_id=None, person_id=None, org_id=None):
     """
-    上传完成
+    修改文件的is_active 状态
+    :param org_id:
+    :param person_id:
+    :param user_id:
     :param fileid:
     :param request:
     :return:
     """
-    for fid in fileid:
-        NsFile.update_file_status(fid)
+    for fileobj in NsFile.objects.filter(pk__in=fileid):
+        NsFile.update_file_status(fileobj, user_id, person_id, org_id)
     return get_result(True, '')

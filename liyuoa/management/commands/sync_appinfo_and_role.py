@@ -17,7 +17,7 @@ class Command(BaseCommand):
         for app in settings.INSTALLED_APPS:
             try:
                 m = importlib.importmodule("%s.app_config" % app)
-                sync_app_info_and_role(m.used_app, m.APP_NAMESPACE)
+                sync_app_info_and_role(m.used_app, app)
                 print app, u': sync success'
             except:
                 common_except_log()

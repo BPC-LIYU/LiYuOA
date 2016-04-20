@@ -104,7 +104,7 @@ class Permissions(BaseModel):
     role = models.ForeignKey('liyuoa.AppRole', verbose_name=u'应用')
 
     class Meta:
-        unique_together = (("org", "user", "app"),)
+        unique_together = (("org", "person", "app"),)
 
         list_json = ['org_id', 'app__name', 'app__flag', 'app__typeflag', 'id', 'role__name', 'role_id']
         detail_json = ['create_time', 'is_active', 'person_id', 'person__user_id', 'person__realname',
