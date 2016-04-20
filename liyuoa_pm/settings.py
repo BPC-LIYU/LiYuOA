@@ -145,6 +145,18 @@ USER_ICON_BG_COLORS = [
     '#f9c01c',
 ]
 
+# 七牛ak sk
+# by:王健 at:2016-04-20
+QN_AK = ''
+
+QN_SK = ''
+
+QN_BUCKET_CONFIG = {
+
+}
+
+QN_PUBLIC_BUCKET = ''
+QN_PRIVATE_BUCKET = ''
 
 # **********************************************************
 # **               注意将所有配置添加到此行之前               **

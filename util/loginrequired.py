@@ -1,7 +1,7 @@
 # coding=utf-8
 # Date: 11-12-8
 # Time: 下午10:28
-
+import json
 import re
 
 from util.jsonresult import get_result
@@ -88,32 +88,35 @@ def request_parmes_value_check(name, value, check):
     """
     if check == 'r':
         if not value:
-            return "%s不能为空" % (name)
+            return "%s不能为空" % name
     elif check == 'int':
         if value:
             try:
-                v = int(value)
+                return None, int(value)
             except:
-                return "%s应为整数" % (name)
-    elif check == 'ints':  # 逗号分隔的int值
+                return "%s应为整数" % name
+    elif check == '[int]':  # 逗号分隔的int值
         if value:
             try:
-                ints = value.split(',')
-                for i in ints:
-                    if i:
-                        v = int(i)
+                return None, [int(x) for x in value.strip(',').split(',') if x]
             except:
-                return "%s应为逗号分隔的整数" % (name)
+                return "%s应为逗号分隔的整数" % name
     elif check == 'email':
         if value:
-            if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", value) == None:
-                return "%s应为email格式" % (name)
+            if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", value) is None:
+                return "%s应为email格式" % name
     elif check == 'phone':
         if value:
-            if re.match("^[\d\-]*$", value) == None:
-                return "%s应为电话号码" % (name)
+            if re.match("^[\d\-]*$", value) is None:
+                return "%s应为电话号码" % name
+    elif check == 'json':
+        if value:
+            try:
+                return None, json.loads(value)
+            except:
+                return "%s应为整数" % name
 
-    return None
+    return None, value
 
 
 def check_request_parmes(**checks):
@@ -132,7 +135,8 @@ def check_request_parmes(**checks):
                 value = request.REQUEST.get(key)
                 check_args = parm[1].split(',')
                 for check in check_args:
-                    error = request_parmes_value_check(name, value, check)
+                    error, v = request_parmes_value_check(name, value, check)
+                    kwargs[key] = v
                     if error:
                         errors.append(error)
 
@@ -143,4 +147,3 @@ def check_request_parmes(**checks):
         return test
 
     return check_request_parmes_func
-
