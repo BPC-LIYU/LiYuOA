@@ -10,6 +10,7 @@ import os
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 
 class Command(BaseCommand):
@@ -156,7 +157,7 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
 
     if change:
         api.save()
-        AppApiCareUser.objects.filter(api=api).update(is_confirm=False, update_time=datetime.datetime.now())
+        AppApiCareUser.objects.filter(api=api).update(is_confirm=False, update_time=timezone.now())
 
     # 参数解析成字典
     parameter = None
@@ -240,7 +241,7 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
         if line.strip().find(':return:') == 0:
             d_start = i
         if line.strip().find('by:') == 0:
-            dl.append((i, [x.strip() for x in line.replace('by:').split('at:') if x]))
+            dl.append((i, [x.strip() for x in line.replace('by:', '').split('at:') if x]))
     replay_dict_list = []
 
     # 找到最后保存的一个代码修改评论
@@ -251,7 +252,7 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
         date = datetime.datetime.strptime(auth_arr[1], '%Y-%m-%d')
         replay_dict_list.append({"content": line, "auth": auth, "date": date})
         d_start = line_index + 1
-        if last_replay.content == line:
+        if last_replay and last_replay.content == line:
             replay_index = i
 
     # 从最后一个修改评论开始新建
@@ -259,7 +260,7 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
         a = AppApiReplay()
         a.api = api
         a.content = replay_dict_list[i]['content']
-        a.username = replay_dict_list[i]['username']
+        a.username = replay_dict_list[i]['auth']
         a.source = 0
         a.create_time = replay_dict_list[i]['date']
         a.save()
