@@ -8,19 +8,24 @@ from django.conf import settings
 from django.core.management import BaseCommand
 import importlib
 
-from util.tools import common_except_log
+from django.db import transaction
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        for app in settings.INSTALLED_APPS:
-            try:
-                m = importlib.importmodule("%s.app_config" % app)
-                sync_app_info_and_role(m.used_app, app)
-                print app, u': sync success'
-            except:
-                common_except_log()
+        with transaction.atomic():
+            for app in settings.INSTALLED_APPS:
+                try:
+                    if app.find('django') == 0:
+                        continue
+                    m = importlib.import_module("%s.app_config" % app)
+                    sync_app_info_and_role(m.used_app, app)
+                    print app, u': sync success'
+                except ImportError as e:
+                    # common_except_log()
+                    print app, u': sync fail'
+                    pass
 
 
 def sync_app_info_and_role(used_app, APP_NAMESPACE):
@@ -58,16 +63,16 @@ def sync_app_info_and_role(used_app, APP_NAMESPACE):
                     for role in rolelist:
                         if role.role == role_cls.role and role.app_id == app.id:
                             has_role = True
-                            role.name = role_cls.name
-                            role.desc = role_cls.desc
+                            role.name = role_cls.role_name
+                            role.desc = role_cls.role_desc
                             role.is_active = True
 
                     # 应用下创建新的角色
                     if not has_role:
                         role = AppRole()
                         role.role = role_cls.role
-                        role.name = role_cls.name
-                        role.desc = role_cls.desc
+                        role.name = role_cls.role_name
+                        role.desc = role_cls.role_desc
                         role.app = app
                         role.save()
 
@@ -84,8 +89,8 @@ def sync_app_info_and_role(used_app, APP_NAMESPACE):
             for role_cls in app_cls.role_list:
                 role = AppRole()
                 role.role = role_cls.role
-                role.name = role_cls.name
-                role.desc = role_cls.desc
+                role.name = role_cls.role_name
+                role.desc = role_cls.role_desc
                 role.app = app
                 role.save()
 
