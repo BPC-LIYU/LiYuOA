@@ -79,7 +79,9 @@ class SessionTransferMiddleware(object):
     """
 
     def process_request(self, request):
-        session_key = request.REQUEST.get('sessionid', None)
+        session_key = request.POST.get('sessionid', None)
+        if not session_key:
+            session_key = request.GET.get('sessionid', None)
         if not session_key:
             session_key = request.META.get('HTTP_SESSIONID', None)
         request.url_cookie = session_key

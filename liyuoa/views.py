@@ -5,6 +5,7 @@
 # Email: wangjian2254@icloud.com
 # Author: 王健
 import time
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 
@@ -25,8 +26,29 @@ def logout(request):
     return get_result(True, '')
 
 
+def check_login(request):
+    """
+    检查是否登录
+    :param request:
+    :param :
+    :return:
+    检查是否登录
+    by:王健 at:2016-04-21
+    """
+    sessionid = request.session.session_key
+    if not sessionid:
+        request.session.save()
+        sessionid = request.session.session_key
+
+    has_login = False
+    if not request.user.is_anonymous():
+        has_login = True
+
+    return get_result(True, u'', {"has_login": has_login, "sessionid": sessionid})
+
+
 @check_request_parmes(realname=("真实姓名", 'r'), username=("手机号", "r,phone"), password=("密码", "r"),
-                      email=("电子邮箱", "email"), code=("验证码", "r,int"))
+                      email=("电子邮箱", "email", ''), code=("验证码", "r,int"))
 def reg_user(request, realname, username, password, email, code):
     """
     注册用户
@@ -41,7 +63,7 @@ def reg_user(request, realname, username, password, email, code):
     by:王健 at:2016-04-21
     """
 
-    if code != request.session.get('smscode', '1234'):
+    if code != request.session.get('smscode', 1234):
         return get_result(False, u'短信验证码输入错误，请核实！', None)
     if username != request.session.get('smsusername', ''):
         return get_result(False, u'发送验证码的手机号，和注册的手机号不符合。请重新输入', None)
@@ -53,8 +75,9 @@ def reg_user(request, realname, username, password, email, code):
     user.realname = realname
     user.set_password(password)
     user.email = email
-    user.icon_url = getUserIconUrl(user.id, user.realname)
     user.save()
+    user.icon_url = getUserIconUrl(user.id, user.realname)
+    user.save(update_fields=['icon_url'])
     request.session['smscode'] = None
 
     user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -145,7 +168,7 @@ def change_password_by_code(request, username, newpassword, code):
     通手机验证码修改密码
     by:王健 at:2016-04-21
     """
-    if code != request.session.get('smscode', '1234'):
+    if code != request.session.get('smscode', 1234):
         return get_result(False, u'短信验证码输入错误，请核实！')
     if username != request.session.get('smsusername'):
         return get_result(False, u'手机号和短信验证码发送的手机号不一致，请核实！', None)
@@ -195,7 +218,7 @@ def send_sms_code_reg(request, tel):
     注册时发送验证码
     by:王健 at:2016-04-21
     """
-    #todo:虚假发送验证码,待完善
+    # todo:虚假发送验证码,待完善
     before_sms = request.session.get('smstime')
     if before_sms and time.time() - before_sms < 60:
         return get_result(False, u'每分钟只能发送一条验证码短信')
@@ -204,8 +227,8 @@ def send_sms_code_reg(request, tel):
         return get_result(False, u'当天发送短信验证码太多')
     request.session['smsusername'] = tel
     request.session['smstime'] = time.time()
-    request.session['smscode'] = '1234'
-    request.session['smsnum'] = num+1
+    request.session['smscode'] = 1234
+    request.session['smsnum'] = num + 1
 
     return get_result(True, u'发送验证码成功')
 
@@ -220,7 +243,7 @@ def send_sms_code(request, tel):
     发送修改密码的验证码
     by:王健 at:2016-04-21
     """
-    #todo:虚假发送验证码,待完善
+    # todo:虚假发送验证码,待完善
     before_sms = request.session.get('smstime')
     if before_sms and time.time() - before_sms < 60:
         return get_result(False, u'每分钟只能发送一条验证码短信')
@@ -230,9 +253,22 @@ def send_sms_code(request, tel):
     if get_user_model().objects.filter(username=tel).exists():
         request.session['smsusername'] = tel
         request.session['smstime'] = time.time()
-        request.session['smscode'] = '1234'
-        request.session['smsnum'] = num+1
+        request.session['smscode'] = 1234
+        request.session['smsnum'] = num + 1
     else:
         return get_result(False, u'手机号不存在')
 
     return get_result(True, u'发送验证码成功')
+
+
+@client_login_required
+def my_userinfo(request):
+    """
+    获取我的个人信息
+    :param request:
+    :return:
+    获取我的个人信息
+    by:王健 at:2016-04-21
+    """
+    user = request.user.toJSON()
+    return get_result(True, u'', user)

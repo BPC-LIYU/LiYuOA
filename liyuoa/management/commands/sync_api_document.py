@@ -12,11 +12,14 @@ from django.core.management import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
+from liyuoa.models import AppApi, AppApiCareUser
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         with transaction.atomic():
             l = urlAll('^', settings.ROOT_URLCONF)
+            urls = []
             for url, fun in l:
                 print url, ":", fun
                 a = fun.split('.')
@@ -24,6 +27,9 @@ class Command(BaseCommand):
                 fun_path = os.path.join(settings.BASE_DIR, *a[:-1])
                 check, doclist, code = get_fun_info(fun_path, fun_name)
                 save_fun_info(url, fun_name, fun_path, check, doclist, code)
+                urls.append(url)
+            AppApi.objects.exclude(url__in=urls).update(is_active=False, update_time=timezone.now())
+            AppApiCareUser.objects.exclude(api__url__in=urls).update(is_active=False, update_time=timezone.now())
 
 
 def urlAll(pattern, urlconf_name):
@@ -180,6 +186,10 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
                 old_parameter = True
                 title = value[0]
                 check_args = value[1].split(',')
+                if len(value) == 3:
+                    p.default = value[2]
+                else:
+                    p.default = None
                 p.title = title
                 p.is_required = 'r' in check_args
                 if 'r' not in check_args:
@@ -202,6 +212,10 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
             p.api = api
             p.name = name
             p.title = title
+            if len(value) == 3:
+                p.default = value[2]
+            else:
+                p.default = None
             if 'r' not in check_args:
                 parm_type = ','.join(check_args)
                 p.is_required = False

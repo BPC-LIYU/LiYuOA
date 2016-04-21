@@ -55,6 +55,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'util.middleware.ETagMiddleware',
     'util.middleware.CorsMiddleware',
     'util.middleware.GlobRequestMiddleware',
     'util.middleware.SessionTransferMiddleware',
@@ -69,8 +70,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'util.error_middle.ExceptionMiddleware',
-    'util.middleware.ETagMiddleware',
-
 )
 
 ROOT_URLCONF = 'liyuoa_pm.urls'
@@ -167,6 +166,8 @@ QN_BUCKET_CONFIG = {
 
 QN_PUBLIC_BUCKET = ''
 QN_PRIVATE_BUCKET = ''
+
+HOST_URL = '0.0.0.0:8001'
 
 # **********************************************************
 # **               注意将所有配置添加到此行之前               **

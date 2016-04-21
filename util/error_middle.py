@@ -6,15 +6,19 @@ import logging
 import sys
 import traceback
 
+from django import http
 from django.conf import settings
 
-from util.jsonresult import getResult
+from util.jsonresult import get_result
 
 __author__ = u'王健'
 
 from raven import Client
 
-client = Client(settings.SENTRY_CLIENT_KEY)
+try:
+    client = Client(settings.SENTRY_CLIENT_KEY)
+except:
+    client = None
 
 
 class ExceptionMiddleware(object):
@@ -22,6 +26,9 @@ class ExceptionMiddleware(object):
     错误异常捕获的中间件
     by:王健 at:2015-1-3
     """
+    def process_request(self, request):
+        if request.method == 'OPTIONS':
+            return http.HttpResponse()
 
     def process_exception(self, request, e):
         """
@@ -78,8 +85,8 @@ class ExceptionMiddleware(object):
             tb = tb.tb_next
         if not settings.DEBUG:
             log.exception('\n    '.join(s))
-            return getResult(False, u'服务器端错误,请联系管理员,错误标记码：%s' % errorid, dialog=2)
+            return get_result(False, u'服务器端错误,请联系管理员,错误标记码：%s' % errorid, dialog=2)
         else:
             m = '\n    '.join(s)
             log.exception(m)
-            return getResult(False, u'服务器端错误,错误如下：\n%s' % (m), dialog=2)
+            return get_result(False, u'服务器端错误,错误如下：\n%s' % (m), dialog=2)

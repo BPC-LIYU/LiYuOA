@@ -105,6 +105,7 @@ class AppApiParameter(BaseModel):
     name = models.CharField(max_length=30, db_index=True, verbose_name=u'参数名')
     title = models.CharField(max_length=20, verbose_name=u'参数中文名')
     desc = models.CharField(max_length=100, verbose_name=u'参数备注')
+    default = models.CharField(max_length=30, null=True, verbose_name=u'参数备注')
     parm_type = models.CharField(max_length=10, verbose_name=u'参数类型')
     is_required = models.BooleanField(default=False, verbose_name=u'是否必须')
     update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')

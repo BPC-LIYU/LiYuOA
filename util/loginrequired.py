@@ -88,33 +88,33 @@ def request_parmes_value_check(name, value, check):
     """
     if check == 'r':
         if not value:
-            return "%s不能为空" % name
+            return "%s不能为空" % name, None
     elif check == 'int':
         if value:
             try:
                 return None, int(value)
             except:
-                return "%s应为整数" % name
+                return "%s应为整数" % name, None
     elif check == '[int]':  # 逗号分隔的int值
         if value:
             try:
                 return None, [int(x) for x in value.strip(',').split(',') if x]
             except:
-                return "%s应为逗号分隔的整数" % name
+                return "%s应为逗号分隔的整数" % name, None
     elif check == 'email':
         if value:
             if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", value) is None:
-                return "%s应为email格式" % name
+                return "%s应为email格式" % name, None
     elif check == 'phone':
         if value:
             if re.match("^[\d\-]*$", value) is None:
-                return "%s应为电话号码" % name
+                return "%s应为电话号码" % name, None
     elif check == 'json':
         if value:
             try:
                 return None, json.loads(value)
             except:
-                return "%s应为整数" % name
+                return "%s应为整数" % name, None
 
     return None, value
 
@@ -132,7 +132,9 @@ def check_request_parmes(**checks):
             errors = []
             for key, parm in checks.items():
                 name = parm[0]
-                value = request.REQUEST.get(key)
+                value = request.POST.get(key)
+                if not value:
+                    value = request.GET.get(key)
                 check_args = parm[1].split(',')
                 for check in check_args:
                     error, v = request_parmes_value_check(name, value, check)
