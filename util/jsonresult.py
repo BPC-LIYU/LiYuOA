@@ -5,6 +5,8 @@ import collections
 import json
 
 import datetime
+
+from django.core.paginator import Page
 from django.http import HttpResponse
 
 __author__ = u'王健'
@@ -15,7 +17,7 @@ BASE_DATETIME_FROMATE = '%Y-%m-%d %H:%M:%S'
 BASE_TIME_FORMATE = '%H:%M'
 
 
-class DateEncoder(json.JSONEncoder):
+class LiYuEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.strftime(BASE_DATETIME_FROMATE)
@@ -23,6 +25,8 @@ class DateEncoder(json.JSONEncoder):
             return obj.strftime(BASE_DATE_FROMATE)
         elif isinstance(obj, datetime.time):
             return obj.strftime(BASE_TIME_FORMATE)
+        elif isinstance(obj, Page):
+            return {"list": obj.object_list, "page_index": obj.number, "page_count": obj.paginator.num_pages}
         return json.JSONEncoder.default(self, obj)
 
 
@@ -80,7 +84,7 @@ def get_result(success, message, result=None, status_code=0, dialog=0):
     if not success and status_code == 0:
         data['status_code'] = 4
 
-    jsonstr = json.dumps(data, cls=DateEncoder)
+    jsonstr = json.dumps(data, cls=LiYuEncoder)
     return JSONHttpResponse(content=jsonstr, json_data=data, content_type=u'application/json')
 
 

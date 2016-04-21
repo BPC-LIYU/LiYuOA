@@ -18,6 +18,7 @@ class Command(BaseCommand):
         with transaction.atomic():
             l = urlAll('^', 'liyuoa_pm.urls')
             for url, fun in l:
+                print url, ":", fun
                 a = fun.split('.')
                 fun_name = a[-1]
                 fun_path = os.path.join(settings.BASE_DIR, *a[:-1])
@@ -133,12 +134,12 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
         api = AppApi.objects.get(url=url)
     else:
         api = AppApi()
-        for m in settings.INSTALLED_APPS:
-            if funpath.find(m) == 0:
-                try:
-                    api.app = AppInfo.objects.filter(namespace=m, is_active=True)[0]
-                except:
-                    api.app = None
+    m = url.split('/')[0]
+    try:
+        api.app = AppInfo.objects.get(flag=m, is_active=True)
+    except AppInfo.DoesNotExist:
+        api.app = None
+        print m, ':', '没有appinfo'
 
     namespace = '%s.%s' % (funpath, funname)
     change = False
@@ -159,6 +160,9 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
         api.save()
         AppApiCareUser.objects.filter(api=api).update(is_confirm=False, update_time=timezone.now())
 
+    if not check:
+        AppApiParameter.objects.filter(api=api).update(is_active=False)
+        return
     # 参数解析成字典
     parameter = None
     try:

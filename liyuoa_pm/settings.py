@@ -55,14 +55,22 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'util.middleware.CorsMiddleware',
+    'util.middleware.GlobRequestMiddleware',
+    'util.middleware.SessionTransferMiddleware',
+    'util.middleware.UserAgentMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'util.middleware.CustomAuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
+    'util.error_middle.ExceptionMiddleware',
+    'util.middleware.ETagMiddleware',
+
 )
 
 ROOT_URLCONF = 'liyuoa_pm.urls'

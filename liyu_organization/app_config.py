@@ -33,7 +33,7 @@ class Manager:
 
 class AppOrganization:
     name = AppOrganizationName
-    flag = 'organization'
+    flag = 'org'
     type_flag = u'default'
     is_show = False
     desc = u'组织中的组织架构,涉及分组、权限、用户管理等功能'

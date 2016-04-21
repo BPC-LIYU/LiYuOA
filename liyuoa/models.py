@@ -11,10 +11,12 @@ class LYUser(AbstractUser, JSONBaseMixin, ModefyMixin):
     """
     基础用户类
     by:王健 at:2016-04-18
+    username 字段 保存的是用户的手机号
+    by:王健 at:2016-04-21
     """
-    tel = models.CharField(max_length=20, unique=True, verbose_name=u'手机号', null=True, blank=False)
     icon_url = models.URLField(verbose_name=u'图标url', null=True)
     realname = models.CharField(max_length=8, verbose_name=u'真实姓名', help_text=u'真实姓名')
+    imusername = models.CharField(max_length=50, unique=True, null=True, verbose_name=u'即时通信账号', help_text=u'即时通信账号')
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
@@ -23,7 +25,7 @@ class LYUser(AbstractUser, JSONBaseMixin, ModefyMixin):
 
     class Meta:
         list_json = ['realname', 'icon_url', 'id']
-        detail_json = ['username', 'email', 'tel', 'is_active', 'is_staff', 'date_joined']
+        detail_json = ['username', 'imusername', 'email', 'username', 'is_active', 'is_staff', 'date_joined']
 
     def __unicode__(self):
         return u'$s#%s' % (self.pk, self.realname)

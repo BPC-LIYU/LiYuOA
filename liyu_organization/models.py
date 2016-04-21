@@ -37,7 +37,7 @@ class Person(BaseModel):
 
     class Meta:
         list_json = ['realname', 'user__icon_url', 'id', 'user_id', 'org_id', 'title', 'manage_type', 'is_active']
-        detail_json = ['user__realname', 'create_time', 'is_gaoguan', 'is_show_tel', 'is_show_email']
+        detail_json = ['user__realname', 'create_time', 'user__imusername', 'is_gaoguan', 'is_show_tel', 'is_show_email']
 
     def __unicode__(self):
         return u'$s#%s' % (self.pk, self.realname)

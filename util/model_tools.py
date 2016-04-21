@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, Page
 
 
 def page_obj_query(query_set, page_index, page_size):
@@ -15,13 +15,12 @@ def page_obj_query(query_set, page_index, page_size):
     p = Paginator(query_set, page_size)
     page_count = p.num_pages
     if page_count == 0:
-        return [], 1, 0
+        return Page([], 0, p)
     try:
-        result = p.page(page_index)
+        return p.page(page_index)
     except PageNotAnInteger:
         page_index = 1
-        result = p.page(page_index)
+        return p.page(page_index)
     except EmptyPage:
         page_index = p.num_pages
-        result = p.page(page_index)
-    return result, page_index, page_count
+        return p.page(page_index)

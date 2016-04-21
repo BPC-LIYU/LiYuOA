@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import util.basemodel
 from django.conf import settings
 
 
@@ -10,7 +11,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('liyu_organization', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('clouddisk', '0002_auto_20160420_2046'),
+        ('clouddisk', '0002_auto_20160421_1007'),
     ]
 
     operations = [
@@ -35,5 +36,6 @@ class Migration(migrations.Migration):
                 'list_json': ['name', 'fileurl', 'bucket', 'id', 'filetype', 'size', 'cloud_disk_id', 'group_type'],
                 'detail_json': ['create_time', 'is_active', 'user_id', 'org_id', 'person_id', 'person__realname', 'person__user__icon_url', 'cloud_disk__name'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
     ]

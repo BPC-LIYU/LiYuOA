@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import util.basemodel
 
 
 class Migration(migrations.Migration):
@@ -24,6 +25,7 @@ class Migration(migrations.Migration):
                 'list_json': ['name', 'icon_url', 'id', 'org_id', 'is_active', 'sort', 'parent_id'],
                 'detail_json': ['org__name', 'create_time', 'charge_id', 'charge__user_id', 'charge__realname', 'charge__user__icon_url', 'aide__realname', 'aide__user__icon_url', 'aide_id', 'aide__user_id'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='Organization',
@@ -38,6 +40,7 @@ class Migration(migrations.Migration):
                 'list_json': ['name', 'icon_url', 'id'],
                 'detail_json': ['create_time', 'is_active'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='OrgApp',
@@ -51,6 +54,7 @@ class Migration(migrations.Migration):
                 'list_json': ['org_id', 'app__name', 'id', 'sort', 'app__flag', 'app__typeflag'],
                 'detail_json': ['create_time', 'is_active'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='Permissions',
@@ -63,6 +67,7 @@ class Migration(migrations.Migration):
                 'list_json': ['org_id', 'app__name', 'app__flag', 'app__typeflag', 'id', 'role__name', 'role_id'],
                 'detail_json': ['create_time', 'is_active', 'person_id', 'person__user_id', 'person__realname', 'person__user__icon_url', 'role__role', 'role__desc'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='Person',
@@ -80,8 +85,9 @@ class Migration(migrations.Migration):
             ],
             options={
                 'list_json': ['realname', 'user__icon_url', 'id', 'user_id', 'org_id', 'title', 'manage_type', 'is_active'],
-                'detail_json': ['user__realname', 'create_time', 'is_gaoguan', 'is_show_tel', 'is_show_email'],
+                'detail_json': ['user__realname', 'create_time', 'user__imusername', 'is_gaoguan', 'is_show_tel', 'is_show_email'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='ProjectApply',
@@ -98,5 +104,6 @@ class Migration(migrations.Migration):
                 'list_json': ['user__realname', 'user__icon_url', 'id', 'org_id', 'status', 'content'],
                 'detail_json': ['org__name', 'create_time', 'is_active', 'checker_id', 'checker__user_id', 'checker__user__icon_url', 'checker__realname'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
     ]

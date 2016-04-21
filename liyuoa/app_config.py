@@ -80,4 +80,4 @@ class AppDevelop:
     Leader = Leader
     Manager = Manager
 
-used_app = [AppDevelop]
+used_app = [AppSys, AppDevelop]

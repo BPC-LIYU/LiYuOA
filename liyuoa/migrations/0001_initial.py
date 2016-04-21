@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import util.basemodel
 import django.utils.timezone
 import django.core.validators
 
@@ -26,14 +27,15 @@ class Migration(migrations.Migration):
                 ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
                 ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-                ('tel', models.CharField(max_length=20, unique=True, null=True, verbose_name='\u624b\u673a\u53f7')),
                 ('icon_url', models.URLField(null=True, verbose_name='\u56fe\u6807url')),
-                ('realname', models.CharField(help_text='\u771f\u5b9e\u59d3\u540d', max_length=8, null=True, verbose_name='\u771f\u5b9e\u59d3\u540d', blank=True)),
+                ('realname', models.CharField(help_text='\u771f\u5b9e\u59d3\u540d', max_length=8, verbose_name='\u771f\u5b9e\u59d3\u540d')),
+                ('imusername', models.CharField(help_text='\u5373\u65f6\u901a\u4fe1\u8d26\u53f7', max_length=50, unique=True, null=True, verbose_name='\u5373\u65f6\u901a\u4fe1\u8d26\u53f7')),
             ],
             options={
                 'list_json': ['realname', 'icon_url', 'id'],
-                'detail_json': ['username', 'email', 'tel', 'is_active', 'is_staff', 'date_joined'],
+                'detail_json': ['username', 'imusername', 'email', 'username', 'is_active', 'is_staff', 'date_joined'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='AppApi',
@@ -51,6 +53,7 @@ class Migration(migrations.Migration):
                 'list_json': ['name', 'url', 'id', 'namespace'],
                 'detail_json': ['create_time', 'is_active', 'code_content'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='AppApiCareUser',
@@ -65,6 +68,7 @@ class Migration(migrations.Migration):
                 'list_json': ['user_id', 'user__icon_url', 'id', 'user__realname', 'update_time', 'api_id', 'is_confirm'],
                 'detail_json': ['create_time', 'is_active'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='AppApiParameter',
@@ -83,6 +87,7 @@ class Migration(migrations.Migration):
                 'list_json': ['name', 'title', 'id', 'parm_type', 'is_required', 'update_time', 'api_id', 'desc'],
                 'detail_json': ['create_time', 'is_active'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='AppApiReplay',
@@ -99,6 +104,7 @@ class Migration(migrations.Migration):
                 'list_json': ['content', 'user_id', 'id', 'api_id', 'user__realname', 'user__icon_url', 'to_user__realname', 'to_user__icon_url', 'create_time', 'to_replay_id', 'to_replay__content', 'to_replay__user_id', 'to_replay__user__icon_url', 'to_replay__user__realname', 'is_auto'],
                 'detail_json': ['is_active'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='AppInfo',
@@ -117,6 +123,7 @@ class Migration(migrations.Migration):
                 'list_json': ['flag', 'name', 'id', 'type_flag'],
                 'detail_json': ['create_time', 'is_active', 'desc'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
         migrations.CreateModel(
             name='AppRole',
@@ -133,5 +140,6 @@ class Migration(migrations.Migration):
                 'list_json': ['role', 'name', 'id', 'desc'],
                 'detail_json': ['create_time', 'is_active'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
     ]

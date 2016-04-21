@@ -46,14 +46,14 @@ class ValuesQuerySet(models.QuerySet):
         ex_parms.extend(self.model.Meta.detail_json)
         return self.list_json(ex_parms, un_parms)
 
-    def get_serializer(self):
+    def get_serializer(self, **kwargs):
         """
         序列化 obj
         by:王健 at:2016-04-19
         :return:
         """
         try:
-            return self.detail_json()[0]
+            return self.detail_json().filter(**kwargs)[0]
         except IndexError:
             raise self.model.DoesNotExist()
 

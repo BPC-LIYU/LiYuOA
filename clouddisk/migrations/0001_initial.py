@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import util.basemodel
 
 
 class Migration(migrations.Migration):
@@ -25,5 +26,6 @@ class Migration(migrations.Migration):
                 'list_json': ['name', 'is_pub', 'id', 'org_id', 'user_id', 'father_id', 'disk_type'],
                 'detail_json': ['user_id', 'create_time', 'is_active'],
             },
+            bases=(models.Model, util.basemodel.JSONBaseMixin, util.basemodel.ModefyMixin),
         ),
     ]
