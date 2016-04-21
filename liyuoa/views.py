@@ -4,14 +4,23 @@
 # file:app_config.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
+import os
 import time
 
+import cStringIO
+from django import http
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
 from util.tools import getUserIconUrl
+
+try:
+    from PIL import Image, ImageColor, ImageFont, ImageDraw
+except:
+    pass
 
 
 def logout(request):
@@ -272,3 +281,60 @@ def my_userinfo(request):
     """
     user = request.user.toJSON()
     return get_result(True, u'', user)
+
+
+@check_request_parmes(color=("颜色", "r"), text=("文字", 'r'), width=("宽度", 'int'), height=("高度", 'int'))
+def text_icon(request, color, text, width, height):
+    """
+    获取文本组合的头像
+    :param request:
+    :param color:
+    :param text:
+    :param width:
+    :param height:
+    :return:
+    获取文本组合的头像
+    by:范俊伟 at:2016-04-21
+    """
+
+    etag = request.META.get('HTTP_IF_NONE_MATCH')
+    if etag:
+        return http.HttpResponseNotModified()
+    image_size = 150
+    base = Image.new("RGBA", (image_size, image_size), color=(255, 255, 255, 0))
+    color = Image.new("RGBA", (image_size, image_size), color=ImageColor.getcolor(color, "RGBA"))
+    mask = Image.open(os.path.join(settings.BASE_DIR, 'util', 'circle.png'))
+    base.paste(color, mask=mask)
+    fnt = ImageFont.truetype(os.path.join(settings.BASE_DIR, 'util', 'SimHei.ttf'), 73)
+    text_size = fnt.getsize(text)
+    d = ImageDraw.Draw(base)
+    x = (image_size - text_size[0]) / 2
+    y = (image_size - text_size[1]) / 2
+    d.text((x, y), text, font=fnt, fill=(255, 255, 255, 255))
+    if width and height:
+        width = int(width)
+        height = int(height)
+        base = base.resize((width, height), Image.ANTIALIAS)
+    out = cStringIO.StringIO()
+    base.save(out, format='png')
+    s = out.getvalue()
+    response = http.HttpResponse(s, content_type=u'image/png')
+    response['Cache-Control'] = "max-age=604800, must-revalidate"
+    return response
+
+
+@check_request_parmes(id=('用户id', 'r,int'), realname=("姓名", 'r'), width=("宽度", '', ''), height=("高度", '', ''))
+def user_icon(request, id, realname, width, height):
+    """
+    获取用户头像
+    :param request:
+    :param id:
+    :param realname:
+    :param width:
+    :param height:
+    :return:
+    获取用户头像
+    by:范俊伟 at:2016-04-21
+    """
+    url = getUserIconUrl(id, realname, width, height)
+    return http.HttpResponseRedirect(url)
