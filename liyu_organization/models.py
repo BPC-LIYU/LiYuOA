@@ -1,4 +1,4 @@
-#coding=utf-8
+# coding=utf-8
 from django.conf import settings
 from django.db import models
 
@@ -38,6 +38,9 @@ class Person(BaseModel):
     class Meta:
         list_json = ['realname', 'user__icon_url', 'id', 'user_id', 'org_id', 'title', 'manage_type', 'is_active']
         detail_json = ['user__realname', 'create_time', 'is_gaoguan', 'is_show_tel', 'is_show_email']
+
+    def __unicode__(self):
+        return u'$s#%s' % (self.pk, self.realname)
 
 
 class Group(BaseModel):
@@ -109,3 +112,6 @@ class Permissions(BaseModel):
         list_json = ['org_id', 'app__name', 'app__flag', 'app__typeflag', 'id', 'role__name', 'role_id']
         detail_json = ['create_time', 'is_active', 'person_id', 'person__user_id', 'person__realname',
                        'person__user__icon_url', 'role__role', 'role__desc']
+
+    def __unicode__(self):
+        return u'$s#%s#%s' % (self.pk, self.app.name, self.role.name)

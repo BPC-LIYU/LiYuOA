@@ -2,9 +2,8 @@
 # Date: 15/1/29'
 # Email: wangjian2254@icloud.com
 
-import datetime
-from django.db import models
 import django.db.models.options as options
+from django.db import models
 
 from util.model_tools import page_obj_query
 
@@ -79,7 +78,82 @@ class ValuesQuerySet(models.QuerySet):
         return page_obj_query(self, page_index, page_size)
 
 
-class BaseModel(models.Model):
+class JSONBaseMixin(object):
+    """
+    obj 转 JSON 字典
+    by:王健 at:2016-04-21
+    """
+
+    def toJSON(self, ex_parm=None, un_parm=None):
+        """
+        序列化成 dict类型
+        by:王健 at:2015-1-29
+        修改 刚刚修改过 的字符串 日期 bug
+        by:王健 at:2015-2-3
+        对数组类型的字段，优化转化
+        by:王健 at:2015-06-27
+        超出时间外的值，做默认值处理
+        by:王健 at:2015-07-04
+        修改语法 是否是None 应该用 is判断
+        by:王健 at:2015-09-16
+        增加timefield类型转换
+        by: 魏璐 at:2016-02-24
+        :return:
+        """
+        if ex_parm is None:
+            ex_parm = []
+        ex_parm.extend(self._meta.list_json)
+        ex_parm.extend(self._meta.detail_json)
+        ex_parm = set(ex_parm)
+        if un_parm is not None:
+            for p in un_parm:
+                ex_parm.remove(p)
+        ex_parm = list(ex_parm)
+        ex_parm.sort()
+
+        d = {}
+        for attr in ex_parm:
+            if getattr(self, attr, None) is None:
+                d[attr] = None
+            else:
+                d[attr] = getattr(self, attr)
+        return d
+
+
+class ModefyMixin(object):
+    """
+    数据变动区别
+    by:王健 at:2016-04-21
+    """
+
+    def copy_old(self):
+        """
+        复制对象
+        by:王健 at:2016-04-21
+        :return:
+        """
+        if getattr(self, '__old', None) is not None:
+            raise Exception(u'The copy_old function only be used once')
+        self.__old = {}
+        for field in self._meta.fields:
+            self.__old[field.attname] = getattr(self, field.attname, None)
+
+    def compare_old(self):
+        """
+        比较新旧对象
+        by:王健 at:2016-04-21
+        :return:
+        """
+        if getattr(self, '__old', None) is None:
+            raise Exception(u'The copy_old function is not yet in use')
+        diff_attr = {}
+        for key, value in self.__old.items():
+            if value != getattr(self, key, None):
+                diff_attr[key] = (value, getattr(self, key, None))
+        return diff_attr
+
+
+class BaseModel(models.Model, JSONBaseMixin, ModefyMixin):
     """
     组织基础Model类
     by:王健 at:2016-04-18
@@ -93,3 +167,9 @@ class BaseModel(models.Model):
         abstract = True
         list_json = []
         detail_json = []
+
+    def __unicode__(self):
+        if hasattr(self, 'name'):
+            return u'$s#%s' % (self.pk, self.name)
+        else:
+            raise Exception(u'需要重载 __unicode__ 函数')
