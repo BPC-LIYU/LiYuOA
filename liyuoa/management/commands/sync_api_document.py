@@ -22,8 +22,12 @@ class Command(BaseCommand):
                 a = fun.split('.')
                 fun_name = a[-1]
                 fun_path = os.path.join(settings.BASE_DIR, *a[:-1])
-                check, doclist, code = get_fun_info(fun_path, fun_name)
-                save_fun_info(url, fun_name, fun_path, check, doclist, code)
+                try:
+                    check, doclist, code = get_fun_info(fun_path, fun_name)
+                    save_fun_info(url, fun_name, fun_path, check, doclist, code)
+                except Exception as e:
+                    print "error:", url, fun
+                    raise e
 
 
 def urlAll(pattern, urlconf_name):

@@ -54,7 +54,7 @@ def get_appinfo(request, appinfo_id):
     :param request:
     :return:
     查询应用信息
-    by:王健 at:
+    by:王健 at:2016-04-21
     """
     try:
         obj = AppInfo.objects.get_serializer(pk=appinfo_id)
@@ -81,3 +81,20 @@ def query_appcareuser_list(request, api_id, page_index, page_size):
         query = query.filter(api_id=api_id)
 
     return get_result(True, None, query.get_page(page_index, page_size))
+
+
+@check_request_parmes(api_id=("接口id", "r,int"))
+def get_api(request, api_id):
+    """
+    查询接口信息
+    :param api_id:
+    :param request:
+    :return:
+    查询接口信息
+    by:王健 at:2016-04-21
+    """
+    try:
+        obj = AppApi.objects.get_serializer(pk=api_id)
+        return get_result(True, None, obj)
+    except AppApi.DoesNotExist:
+        return get_result(False, u'接口不存在')

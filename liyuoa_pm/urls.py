@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^cd/', include('clouddisk.urls')),
     url(r'^org/', include('liyu_organization.urls')),
     url(r'^sys/', include('liyuoa.urls')),
+    url(r'^develop/', include('liyuoa.develop.urls')),
 ]
