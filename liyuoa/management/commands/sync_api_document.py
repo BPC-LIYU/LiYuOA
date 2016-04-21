@@ -22,12 +22,8 @@ class Command(BaseCommand):
                 a = fun.split('.')
                 fun_name = a[-1]
                 fun_path = os.path.join(settings.BASE_DIR, *a[:-1])
-                try:
-                    check, doclist, code = get_fun_info(fun_path, fun_name)
-                    save_fun_info(url, fun_name, fun_path, check, doclist, code)
-                except Exception as e:
-                    print "error:", url, fun
-                    raise e
+                check, doclist, code = get_fun_info(fun_path, fun_name)
+                save_fun_info(url, fun_name, fun_path, check, doclist, code)
 
 
 def urlAll(pattern, urlconf_name):
@@ -136,6 +132,7 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
     # 新建或修改api
     if AppApi.objects.filter(url=url).exists():
         api = AppApi.objects.get(url=url)
+        api.copy_old()
     else:
         api = AppApi()
     m = url.split('/')[0]
@@ -146,21 +143,13 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
         print m, ':', '没有appinfo'
 
     namespace = '%s.%s' % (funpath, funname)
-    change = False
-    if api.url != url:
-        api.url = url
-        change = True
-    if api.namespace != namespace:
-        api.namespace = namespace
-        change = True
-    if api.code_content != code:
-        api.code_content = code
-        change = True
-    if api.name != doclist[0]:
-        api.name = doclist[0]
-        change = True
-
-    if change:
+    api.url = url
+    api.is_active = True
+    api.namespace = namespace
+    api.code_content = code
+    api.name = doclist[0]
+    created, diff = api.compare_old()
+    if created or diff:
         api.save()
         AppApiCareUser.objects.filter(api=api).update(is_confirm=False, update_time=timezone.now())
 
@@ -180,9 +169,7 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
     # 新建或修改参数
     parameterlist = []
     for p in AppApiParameter.objects.filter(api=api):
-        p.is_active_old = p.is_active
-        p.is_active = False
-
+        p.copy_old()
         parameterlist.append(p)
 
     for name, value in parameter.items():
@@ -193,30 +180,17 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
                 old_parameter = True
                 title = value[0]
                 check_args = value[1].split(',')
-                change = False
-                if p.title != title:
-                    p.title = title
-                    change = True
-                if p.is_required:
-                    if 'r' not in check_args:
-                        p.is_required = False
-                        change = True
-                else:
-                    if 'r' in check_args:
-                        p.is_required = True
-                        change = True
+                p.title = title
+                p.is_required = 'r' in check_args
                 if 'r' not in check_args:
                     parm_type = ','.join(check_args)
                 else:
                     check_args.remove('r')
                     parm_type = ','.join(check_args)
-                if p.parm_type != parm_type:
-                    p.parm_type = parm_type
-                    change = True
-                if not p.is_active_old:
-                    p.is_active = True
-                    change = True
-                if change:
+                p.parm_type = parm_type
+                p.is_active = True
+                created, diff = p.compare_old()
+                if created or diff:
                     p.save()
                 parameterlist.remove(p)
                 break

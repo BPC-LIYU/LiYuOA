@@ -77,7 +77,7 @@ class AppApi(BaseModel):
     code_content = models.TextField(verbose_name=u'代码')
 
     class Meta:
-        list_json = ['name', 'url', 'id', 'namespace']
+        list_json = ['name', 'url', 'id', 'namespace', 'update_time']
         detail_json = ['create_time', 'is_active', 'code_content']
 
 

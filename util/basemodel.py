@@ -132,11 +132,12 @@ class ModefyMixin(object):
         by:王健 at:2016-04-21
         :return:
         """
-        if getattr(self, '__old', None) is not None:
-            raise Exception(u'The copy_old function only be used once')
-        self.__old = {}
-        for field in self._meta.fields:
-            self.__old[field.attname] = getattr(self, field.attname, None)
+        if self.pk:
+            if getattr(self, '_old', None) is not None:
+                raise Exception(u'The copy_old function only be used once')
+            self._old = {}
+            for field in self._meta.fields:
+                self._old[field.attname] = getattr(self, field.attname, None)
 
     def compare_old(self):
         """
@@ -144,13 +145,16 @@ class ModefyMixin(object):
         by:王健 at:2016-04-21
         :return:
         """
-        if getattr(self, '__old', None) is None:
-            raise Exception(u'The copy_old function is not yet in use')
+        if getattr(self, '_old', None) is None:
+            if self.pk:
+                raise Exception(u'The copy_old function is not yet in use')
+            else:
+                return True, {}
         diff_attr = {}
-        for key, value in self.__old.items():
+        for key, value in self._old.items():
             if value != getattr(self, key, None):
                 diff_attr[key] = (value, getattr(self, key, None))
-        return diff_attr
+        return False, diff_attr
 
 
 class BaseModel(models.Model, JSONBaseMixin, ModefyMixin):

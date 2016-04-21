@@ -40,12 +40,12 @@ def sync_app_info_and_role(used_app, APP_NAMESPACE):
     from liyuoa.models import AppRole
     applist = []
     for app in AppInfo.objects.filter(namespace=APP_NAMESPACE):
-        app.is_active = False
+        app.copy_old()
         applist.append(app)
 
     rolelist = []
     for role in AppRole.objects.filter(app__namespace=APP_NAMESPACE):
-        role.is_active = False
+        role.copy_old()
         rolelist.append(role)
     for app_cls in used_app:
         has_app = False
@@ -95,6 +95,12 @@ def sync_app_info_and_role(used_app, APP_NAMESPACE):
                 role.save()
 
     for app in applist:
-        app.save()
+        created, diff = app.compare_old()
+        if created or diff:
+            app.save()
+            print app.name, ":", "发送变化"
     for role in rolelist:
-        role.save()
+        created, diff = role.compare_old()
+        if created or diff:
+            role.save()
+            print role.name, ":", "发送变化"
