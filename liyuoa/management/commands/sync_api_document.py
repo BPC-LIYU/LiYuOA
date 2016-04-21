@@ -16,7 +16,7 @@ from django.utils import timezone
 class Command(BaseCommand):
     def handle(self, *args, **options):
         with transaction.atomic():
-            l = urlAll('^', 'liyuoa_pm.urls')
+            l = urlAll('^', settings.ROOT_URLCONF)
             for url, fun in l:
                 print url, ":", fun
                 a = fun.split('.')
