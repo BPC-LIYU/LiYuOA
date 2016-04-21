@@ -13,6 +13,15 @@ __author__ = u'王健'
 
 
 class ValuesQuerySet(models.QuerySet):
+
+    def get_by_natural_key(self, username):
+        """
+        复制子 BaseUserManager 类
+        :param username:
+        :return:
+        """
+        return self.get(**{self.model.USERNAME_FIELD: username})
+
     def list_json(self, ex_parms=None, un_parms=None):
         """
         列表values Query_Set 返回
