@@ -9,6 +9,38 @@ from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes
 
 
+def query_all_app(request):
+    """
+    查询所有的app list信息
+    :param request:
+    :param :
+    :return:
+    查询所有的app list信息
+    by:王健 at:2016-04-21
+    """
+    query_app = AppInfo.objects.list_json().filter(is_active=True).order_by('name')
+    app_list = []
+    app_dict = {}
+    for app in query_app:
+        app_list.append(app)
+        app_dict[app['id']] = app
+        app['apilist'] = []
+
+    api_dict = {}
+    for api in AppApi.objects.list_json(ex_parms=['app_id']).filter(app__is_active=True, is_active=True).order_by('url'):
+        if app_dict.has_key(api['app_id']):
+            app_dict[api['app_id']]['apilist'].append(api)
+            api_dict[api['id']] = api
+            api['is_confirm'] = False
+
+    for apicare in AppApiCareUser.objects.values('api_id').filter(is_confirm=True, api__is_active=True,
+                                                                                api__app__is_active=True):
+        if api_dict.has_key(apicare['api_id']):
+            apicare['api_id']['is_confirm'] = True
+
+    return get_result(True, u'', app_list)
+
+
 @check_request_parmes(app_id=("应用id", 'int'), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
 def query_api_list(request, app_id, page_index, page_size):
     """

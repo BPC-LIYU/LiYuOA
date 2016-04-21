@@ -61,6 +61,8 @@ def reg_user(request, realname, username, password, email, code):
     :return:
     创建注册用户接口
     by:王健 at:2016-04-21
+    去除icon_url 默认值
+    by:王健 at:2016-04-21
     """
 
     if code != request.session.get('smscode', 1234):
@@ -76,8 +78,6 @@ def reg_user(request, realname, username, password, email, code):
     user.set_password(password)
     user.email = email
     user.save()
-    user.icon_url = getUserIconUrl(user.id, user.realname)
-    user.save(update_fields=['icon_url'])
     request.session['smscode'] = None
 
     user.backend = 'django.contrib.auth.backends.ModelBackend'

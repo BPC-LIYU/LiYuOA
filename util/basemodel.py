@@ -33,7 +33,7 @@ class ValuesQuerySet(models.QuerySet):
         if ex_parms is None:
             ex_parms = []
 
-        ex_parms.extend(self.model.Meta.list_json)
+        ex_parms.extend(self.model._meta.list_json)
         ex_parms = set(ex_parms)
         if un_parms is not None:
             for k in un_parms:
@@ -52,7 +52,7 @@ class ValuesQuerySet(models.QuerySet):
         """
         if ex_parms is None:
             ex_parms = []
-        ex_parms.extend(self.model.Meta.detail_json)
+        ex_parms.extend(self.model._meta.detail_json)
         return self.list_json(ex_parms, un_parms)
 
     def get_serializer(self, **kwargs):
