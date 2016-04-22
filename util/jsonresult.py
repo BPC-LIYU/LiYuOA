@@ -26,7 +26,7 @@ class LiYuEncoder(json.JSONEncoder):
         elif isinstance(obj, datetime.time):
             return obj.strftime(BASE_TIME_FORMATE)
         elif isinstance(obj, Page):
-            return {"list": obj.object_list, "page_index": obj.number, "page_count": obj.paginator.num_pages}
+            return {"list": [x for x in obj.object_list], "page_index": obj.number, "page_count": obj.paginator.num_pages}
         return json.JSONEncoder.default(self, obj)
 
 

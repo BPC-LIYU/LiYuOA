@@ -41,11 +41,11 @@ class AppInfo(BaseModel):
     type_flag = models.CharField(max_length=20, verbose_name=u'应用类型')
     is_show = models.BooleanField(default=True, verbose_name=u'是否显示在应用列表')
     desc = models.TextField(blank=True, verbose_name=u'应用描述')
-    namespace = models.CharField(max_length=20, db_index=True, blank=True, verbose_name=u'应用描述')
+    namespace = models.CharField(max_length=20, db_index=True, blank=True, verbose_name=u'模块名')
 
     class Meta:
         list_json = ['flag', 'name', 'id', 'type_flag']
-        detail_json = ['create_time', 'is_active', 'desc']
+        detail_json = ['create_time', 'is_show', 'is_active', 'desc', 'namespace']
 
 
 class AppRole(BaseModel):
@@ -105,13 +105,13 @@ class AppApiParameter(BaseModel):
     name = models.CharField(max_length=30, db_index=True, verbose_name=u'参数名')
     title = models.CharField(max_length=20, verbose_name=u'参数中文名')
     desc = models.CharField(max_length=100, verbose_name=u'参数备注')
-    default = models.CharField(max_length=30, null=True, verbose_name=u'参数备注')
+    default = models.CharField(max_length=30, null=True, verbose_name=u'参数默认值')
     parm_type = models.CharField(max_length=10, verbose_name=u'参数类型')
     is_required = models.BooleanField(default=False, verbose_name=u'是否必须')
     update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
 
     class Meta:
-        list_json = ['name', 'title', 'id', 'parm_type', 'is_required', 'update_time', 'api_id', 'desc']
+        list_json = ['name', 'title', 'id', 'parm_type', 'is_required', 'update_time', 'api_id', 'desc', 'default']
         detail_json = ['create_time', 'is_active']
 
 
@@ -132,5 +132,5 @@ class AppApiReplay(BaseModel):
     class Meta:
         list_json = ['content', 'user_id', 'id', 'api_id', 'user__realname', 'user__icon_url', 'to_user__realname',
                      'to_user__icon_url', 'create_time', 'to_replay_id', 'to_replay__content', 'to_replay__user_id',
-                     'to_replay__user__icon_url', 'to_replay__user__realname', 'is_auto']
+                     'to_replay__user__icon_url', 'to_replay__user__realname', 'source']
         detail_json = ['is_active']

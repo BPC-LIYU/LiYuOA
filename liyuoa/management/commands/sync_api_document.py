@@ -149,6 +149,8 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
         print m, ':', '没有appinfo'
 
     namespace = '%s.%s' % (funpath, funname)
+    if api.app:
+        namespace = namespace[namespace.find(api.app.namespace):]
     api.url = url
     api.is_active = True
     api.namespace = namespace

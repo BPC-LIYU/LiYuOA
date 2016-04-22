@@ -4,7 +4,7 @@
 # file:views_develop.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
-from liyuoa.models import AppApi, AppInfo, AppApiCareUser
+from liyuoa.models import AppApi, AppInfo, AppApiCareUser, AppApiParameter, AppApiReplay
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes
 
@@ -27,14 +27,15 @@ def query_all_app(request):
         app['apilist'] = []
 
     api_dict = {}
-    for api in AppApi.objects.list_json(ex_parms=['app_id']).filter(app__is_active=True, is_active=True).order_by('url'):
+    for api in AppApi.objects.list_json(ex_parms=['app_id']).filter(app__is_active=True, is_active=True).order_by(
+            'create_time'):
         if app_dict.has_key(api['app_id']):
             app_dict[api['app_id']]['apilist'].append(api)
             api_dict[api['id']] = api
             api['is_confirm'] = False
 
     for apicare in AppApiCareUser.objects.values('api_id').filter(is_confirm=True, api__is_active=True,
-                                                                                api__app__is_active=True):
+                                                                  api__app__is_active=True):
         if api_dict.has_key(apicare['api_id']):
             apicare['api_id']['is_confirm'] = True
 
@@ -59,6 +60,39 @@ def query_api_list(request, app_id, page_index, page_size):
         query = query.filter(app_id=app_id)
 
     return get_result(True, None, query.get_page(page_index, page_size))
+
+
+@check_request_parmes(app_id=("应用id", 'r,int'), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
+def query_api_detail_list(request, app_id, page_index, page_size):
+    """
+    查询接口文档详细信息列表带参数
+    :param page_size:
+    :param page_index:
+    :param app_id:
+    :param request:
+    :return:
+    查询接口,分页
+    by:王健 at:2016-04-21
+    查询接口文档详细信息列表带参数,分页
+    by:王健 at:2016-04-22
+    """
+    query = AppApi.objects.detail_json().filter(is_active=True, app__is_active=True).order_by('create_time')
+
+    query = query.filter(app_id=app_id)
+    page = query.get_page(page_index, page_size)
+    apilist = []
+    apidict = {}
+    for api in page:
+        apilist.append(api)
+        apidict[api['id']] = api
+        api['parameterlist'] = []
+
+    for apiparm in AppApiParameter.objects.list_json().filter(api__app_id=app_id, api__is_active=True, is_active=True,
+                                                              api__app__is_active=True):
+        if apidict.has_key(apiparm['api_id']):
+            apidict[apiparm['api_id']]['parameterlist'].append(apiparm)
+
+    return get_result(True, None, {"list": apilist, 'page_index': page.number, "page_count": page.paginator.num_pages})
 
 
 @check_request_parmes(page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
@@ -127,6 +161,51 @@ def get_api(request, api_id):
     """
     try:
         obj = AppApi.objects.get_serializer(pk=api_id)
+        obj['parameterlist'] = []
+        for apiparm in AppApiParameter.objects.list_json().filter(api_id=api_id, is_active=True):
+            obj['parameterlist'].append(apiparm)
         return get_result(True, None, obj)
     except AppApi.DoesNotExist:
         return get_result(False, u'接口不存在')
+
+
+@check_request_parmes(api_id=("接口id", "r,int"))
+def get_api_detail(request, api_id):
+    """
+    查询接口详细信息, 带修改历史记录
+    :param api_id:
+    :param request:
+    :return:
+    查询接口详细信息
+    by:王健 at:2016-04-22
+    """
+    try:
+        obj = AppApi.objects.get_serializer(pk=api_id)
+        obj['parameterlist'] = []
+        for apiparm in AppApiParameter.objects.list_json().filter(api_id=api_id, is_active=True):
+            obj['parameterlist'].append(apiparm)
+        obj['apicareuser'] = []
+        for careuser in AppApiCareUser.objects.list_json().filter(api_id=api_id, is_active=True, user__is_active=True):
+            obj['apicareuser'].append(careuser)
+        return get_result(True, None, obj)
+    except AppApi.DoesNotExist:
+        return get_result(False, u'接口不存在')
+
+
+@check_request_parmes(api_id=("接口id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
+def query_apireplay_list(request, api_id, page_index, page_size):
+    """
+    查询接口评论列表
+    :param page_size:
+    :param page_index:
+    :param api_id:
+    :param request:
+    :return:
+    查询接口评论列表
+    by:王健 at:2016-04-22
+    """
+    query = AppApiReplay.objects.list_json().filter(is_active=True)
+
+    query = query.filter(api_id=api_id)
+
+    return get_result(True, None, query.get_page(page_index, page_size))
