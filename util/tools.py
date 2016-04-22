@@ -226,21 +226,9 @@ def getUserIconUrl(id, name, width=None, height=None):
     index = id % len(settings.USER_ICON_BG_COLORS)
     color = settings.USER_ICON_BG_COLORS[index]
 
-    return "http://%s/ns/user/user_icon_image?%s" % (
+    return "http://%s/sys/text_icon?%s" % (
             getHost(), urllib.urlencode({"color": color, "text": name, "width": width or '', "height": height or ''}))
 
-
-def getUserIconUrlForTTJD(id):
-    """
-    获取默认的蚂蚁头像
-    by: 范俊伟 at:2015-11-27
-    :param id: 
-    :return: 
-    """
-    from util.middleware import getHost
-    index = id % 12
-    url = "http://%s/static/ttjd_default_head_icon/icon_%02d.png" % (getHost(), index)
-    return url
 
 
 def getPhoneNumber(number):
