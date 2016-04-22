@@ -53,16 +53,16 @@ class ExceptionMiddleware(object):
         import time
 
         errorid = time.time()
-        client.user_context({
-            "errorid": errorid,
-            "url": request.path,
-            "method": request.method,
-            "post": json.dumps(request.POST.items(), ensure_ascii=False),
-            "get": json.dumps(request.GET.items(), ensure_ascii=False),
-            "ENVIRONMENT": settings.ENVIRONMENT,
-
-        })
-        client.captureException()
+        # client.user_context({
+        #     "errorid": errorid,
+        #     "url": request.path,
+        #     "method": request.method,
+        #     "post": json.dumps(request.POST.items(), ensure_ascii=False),
+        #     "get": json.dumps(request.GET.items(), ensure_ascii=False),
+        #     "ENVIRONMENT": settings.ENVIRONMENT,
+        #
+        # })
+        # client.captureException()
         log = logging.getLogger('django')
         s = [u'错误码:%s' % errorid, u'%s:%s' % (request.method, request.path)]
         user = getattr(request, 'user', None)

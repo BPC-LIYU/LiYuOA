@@ -6,7 +6,7 @@
 # Author: 王健
 from liyuoa.models import AppApi, AppInfo, AppApiCareUser, AppApiParameter, AppApiReplay
 from util.jsonresult import get_result
-from util.loginrequired import check_request_parmes
+from util.loginrequired import check_request_parmes, check_response_results
 
 
 def query_all_app(request):
@@ -170,6 +170,9 @@ def get_api(request, api_id):
 
 
 @check_request_parmes(api_id=("接口id", "r,int"))
+@check_response_results(apicareuser=("api关注用户", "list"), code_content=("代码", ""), create_time=("创建时间", "datetime"),
+                        id=("接口id", "int"), is_active=("是否可用", "int"), name=("接口名字", ""), namespace=("函数路径", ""),
+                        parameterlist=("参数列表", "list"), update_time=("最后更新时间", "datetime"), url=("接口url", ""))
 def get_api_detail(request, api_id):
     """
     查询接口详细信息, 带修改历史记录
@@ -192,7 +195,14 @@ def get_api_detail(request, api_id):
         return get_result(False, u'接口不存在')
 
 
-@check_request_parmes(api_id=("接口id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
+@check_request_parmes(api_id=("接口id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 2))
+@check_response_results(user__icon_url=("用户头像url", ""), to_user__icon_url=("被评论用户头像", ""),
+                        user_id=("用户id", "int"),
+                        to_replay__user__realname=("被评论的评论的用户真实姓名", ""), api_id=("接口id", "int"),
+                        content=("评论内容", ""), source=("评论来源", "int"), to_replay__user_id=("被评论的用户id", "int"),
+                        create_time=("评论时间", "datetime"), to_replay_id=("被评论的id", "int"),
+                        to_replay__content=("被评论的内容", ""), user__realname=("用户真实姓名", ""), id=("评论id", "int"),
+                        to_replay__user__icon_url=("被评论的的评论的作者头像", ""), to_user__realname=("被评论的用户真实姓名", ""))
 def query_apireplay_list(request, api_id, page_index, page_size):
     """
     查询接口评论列表

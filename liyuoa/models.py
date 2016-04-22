@@ -132,5 +132,5 @@ class AppApiReplay(BaseModel):
     class Meta:
         list_json = ['content', 'user_id', 'id', 'api_id', 'user__realname', 'user__icon_url', 'to_user__realname',
                      'to_user__icon_url', 'create_time', 'to_replay_id', 'to_replay__content', 'to_replay__user_id',
-                     'to_replay__user__icon_url', 'to_replay__user__realname', 'source']
+                     'to_replay__user__icon_url', 'to_replay__user__realname', 'source', 'username']
         detail_json = ['is_active']

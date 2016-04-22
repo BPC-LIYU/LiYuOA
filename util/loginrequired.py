@@ -1,10 +1,15 @@
 # coding=utf-8
 # Date: 11-12-8
 # Time: 下午10:28
+import datetime
 import json
 import re
 
-from util.jsonresult import get_result
+from django.conf import settings
+from django.core.paginator import Page
+from django.db.models import QuerySet
+
+from util.jsonresult import get_result, JSONHttpResponse
 
 __author__ = u'王健'
 
@@ -137,6 +142,8 @@ def check_request_parmes(**checks):
                     value = request.GET.get(key)
                 check_args = parm[1].split(',')
                 for check in check_args:
+                    if settings.DEBUG:
+                        name = '(%s:%s)' % (key, name)
                     error, v = request_parmes_value_check(name, value, check)
                     kwargs[key] = v
                     if error:
@@ -146,8 +153,102 @@ def check_request_parmes(**checks):
 
             if errors:
                 return get_result(False, ','.join(errors), None)
-            return func(request, *args, **kwargs)
+            if settings.DEBUG:
+                response = func(request, *args, **kwargs)
+                if isinstance(response, JSONHttpResponse):
+                    result = response.json['result']
+                    data = None
+                    if isinstance(result, dict):
+                        if result.has_key('list') and result.has_key('page_index') and result.has_key('page_count'):
+                            if len(result['list']) > 0:
+                                data = result['list'][0]
+                        else:
+                            data = result
+                    elif isinstance(result, Page):
+                        if len(result) > 0:
+                            data = result[0]
+                    elif isinstance(result, list):
+                        if len(result) > 0:
+                            data = result[0]
+                    if data:
+                        fun_str = []
+                        for key, value in data.items():
+                            if isinstance(value, int):
+                                fun_str.append('%s=("", "int")' % key)
+                            elif isinstance(value, datetime.datetime):
+                                fun_str.append('%s=("", "datetime")' % key)
+                            elif isinstance(value, datetime.date):
+                                fun_str.append('%s=("", "date")' % key)
+                            elif isinstance(value, datetime.time):
+                                fun_str.append('%s=("", "time")' % key)
+                            elif isinstance(value, (list, QuerySet)):
+                                fun_str.append('%s=("", "list")' % key)
+                            elif isinstance(value, dict):
+                                fun_str.append('%s=("", "dict")' % key)
+                            elif key.rfind('_id') == len(key) - 3:
+                                fun_str.append('%s=("", "int")' % key)
+                            else:
+                                fun_str.append('%s=("", "")' % key)
+                        fun_str.sort()
+                        print "%s——@check_response_results(%s)" % (request.META.get('PATH_INFO'), ', '.join(fun_str))
+                        print ''
+                return response
+            else:
+                return func(request, *args, **kwargs)
 
         return test
 
     return check_request_parmes_func
+
+
+def check_response_results(**checks):
+    """
+    检测返回值
+    by:王健 at:2016-04-22
+    :param checks:检测条件 例如:校验项目id不能为空 @check_response_results(project_id=('项目iD', 'r'))
+    :return:
+    """
+
+    def check_response_results_func(func=None):
+        def check_response(request, *args, **kwargs):
+
+            response = func(request, *args, **kwargs)
+            if isinstance(response, JSONHttpResponse):
+                errors = []
+                result = response.json['result']
+                data = None
+                if isinstance(result, dict):
+                    if result.has_key('list') and result.has_key('page_index') and result.has_key('page_count'):
+                        if len(result['list']) > 0:
+                            data = result['list'][0]
+                    else:
+                        data = result
+                elif isinstance(result, Page):
+                    if len(result) > 0:
+                        data = result[0]
+                elif isinstance(result, list):
+                    if len(result) > 0:
+                        data = result[0]
+                if data:
+                    for key, parm in checks.items():
+                        name = parm[0]
+                        name = '(%s:%s)' % (key, name)
+                        value = data.get(key, None)
+                        error, v = request_parmes_value_check(name, data.has_key(key), 'r')
+                        if error:
+                            errors.append(error)
+                        check_args = parm[1].split(',')
+                        for check in check_args:
+                            error, v = request_parmes_value_check(name, value, check)
+                            if error:
+                                errors.append(error)
+                    lkey = list(set(checks.keys()) - set(data.keys()))
+                    if lkey:
+                        errors.append('缺少字段:%s' % ','.join(lkey))
+                if errors:
+                    return get_result(False, ','.join(errors), None)
+            return response
+
+        return check_response
+
+    return check_response_results_func
