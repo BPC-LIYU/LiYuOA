@@ -98,9 +98,9 @@ def sync_app_info_and_role(used_app, APP_NAMESPACE):
         created, diff = app.compare_old()
         if created or diff:
             app.save()
-            print app.name, ":", "发送变化"
+            print app.name, ":", "发生变化"
     for role in rolelist:
         created, diff = role.compare_old()
         if created or diff:
             role.save()
-            print role.name, ":", "发送变化"
+            print role.name, ":", "发生变化"

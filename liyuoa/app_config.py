@@ -15,21 +15,21 @@ class SySUser:
     role = 'user'
     role_name = u'用户'
     role_message = u'权限不足,您需要联系管理员,将您的账号在%s 应用中设置为:%s 角色' % (AppSysName, role_name)
-    role_desc = u'获取组织中的组织架构,查询成员信息'
+    role_desc = u'系统用户'
 
 
 class SySLeader:
     role = 'leader'
     role_name = u'主管'
     role_message = u'权限不足,您需要联系管理员,将您的账号在%s 应用中设置为:%s 角色' % (AppSysName, role_name)
-    role_desc = u'新增、修改部门和部门内的成员'
+    role_desc = u'系统主管,创建、查询、管理组织'
 
 
 class SySManager:
     role = 'manager'
     role_name = u'应用管理员'
     role_message = u'权限不足,您需要联系管理员,将您的账号在%s 应用中设置为:%s 角色' % (AppSysName, role_name)
-    role_desc = u'新增、修改、删除所有部门和部门内的成员,设置部门的主管和助手,设置用户和应用的权限,设置新的应用管理员'
+    role_desc = u'管理系统主管'
 
 
 class AppSys:
@@ -37,7 +37,7 @@ class AppSys:
     flag = 'sys'
     type_flag = u'default'
     is_show = False
-    desc = u'组织中的组织架构,涉及分组、权限、用户管理等功能'
+    desc = u'系统中用户、组织、应用管理'
     role_list = [SySUser, SySLeader, SySManager]
 
     User = SySUser
@@ -51,21 +51,21 @@ class User:
     role = 'user'
     role_name = u'用户'
     role_message = u'权限不足,您需要联系管理员,将您的账号在%s 应用中设置为:%s 角色' % (AppDevelopName, role_name)
-    role_desc = u'获取组织中的组织架构,查询成员信息'
+    role_desc = u'开发人员'
 
 
 class Leader:
     role = 'leader'
     role_name = u'主管'
     role_message = u'权限不足,您需要联系管理员,将您的账号在%s 应用中设置为:%s 角色' % (AppDevelopName, role_name)
-    role_desc = u'新增、修改部门和部门内的成员'
+    role_desc = u'开发人员设置接口和开发者信息'
 
 
 class Manager:
     role = 'manager'
     role_name = u'应用管理员'
     role_message = u'权限不足,您需要联系管理员,将您的账号在%s 应用中设置为:%s 角色' % (AppDevelopName, role_name)
-    role_desc = u'新增、修改、删除所有部门和部门内的成员,设置部门的主管和助手,设置用户和应用的权限,设置新的应用管理员'
+    role_desc = u'管理开发主管'
 
 
 class AppDevelop:
@@ -73,7 +73,7 @@ class AppDevelop:
     flag = 'develop'
     type_flag = u'default'
     is_show = False
-    desc = u'组织中的组织架构,涉及分组、权限、用户管理等功能'
+    desc = u'开发项目的相关工具'
     role_list = [User, Leader, Manager]
 
     User = User

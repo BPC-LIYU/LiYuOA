@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'liyu_organization',
     'clouddisk',
     'nsbcs',
+    'liyuim',
 )
 
 MIDDLEWARE_CLASSES = (

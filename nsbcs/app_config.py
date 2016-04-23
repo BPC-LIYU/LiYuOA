@@ -7,7 +7,7 @@
 
 # APP_NAMESPACE = 'liyu_organization'
 
-AppFileName = u'组织架构'
+AppFileName = u'第三方云存储'
 
 
 class User:
