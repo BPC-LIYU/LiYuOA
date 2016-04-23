@@ -37,10 +37,11 @@ class Friend(BaseModel):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='friendowner', null=True, verbose_name=u'好友')
     update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
     is_black = models.BooleanField(default=False, verbose_name=u'是否黑名单')
+    is_muted = models.BooleanField(default=True, verbose_name=u'是否静音')
 
     class Meta:
-        list_json = ['user_id', 'user__realname', 'user__icon_url', 'nickname', 'id', 'owner_id', 'group_id',
-                     'update_time']
+        list_json = ['user_id', 'user__realname', 'user__icon_url', 'nickname', 'id', 'is_muted', 'owner_id',
+                     'group_id', 'update_time']
         detail_json = ['create_time', 'is_active']
 
 
@@ -88,9 +89,10 @@ class TalkUser(BaseModel):
     nickname = models.CharField(max_length=30, verbose_name=u'群名片')
     role = models.IntegerField(default=0, verbose_name=u'群角色', help_text=u'0:成员;1:管理员;')
     read_tiemline = models.IntegerField(default=0, verbose_name=u'已读时间戳')
+    is_muted = models.BooleanField(default=True, verbose_name=u'是否静音')
 
     class Meta:
-        list_json = ['id', 'user__realname', 'user__icon_url', 'nickname', 'role', 'read_timeline']
+        list_json = ['id', 'user__realname', 'user__icon_url', 'nickname', 'role', 'is_muted', 'read_timeline']
         detail_json = ['create_time', 'is_active']
 
 
@@ -121,7 +123,8 @@ class TalkApply(BaseModel):
     checker = models.ForeignKey(TalkUser, null=True, verbose_name=u'处理人')
 
     class Meta:
-        list_json = ['id', 'talk_id', 'talk__icon_url', 'talk__name', 'status', 'content', 'reply', 'checker_id', 'checker__nickname', 'checker__user__icon_url']
+        list_json = ['id', 'talk_id', 'talk__icon_url', 'talk__name', 'status', 'content', 'reply', 'checker_id',
+                     'checker__nickname', 'checker__user__icon_url']
         detail_json = ['create_time', 'is_active']
 
 
