@@ -7,8 +7,8 @@
 from urllib import urlencode
 
 from django.contrib.auth import authenticate
-from django.core.cache import cache
 from django.contrib.auth import login as auth_login
+from django.core.cache import cache
 from django.utils.crypto import get_random_string
 
 from util.jsonresult import get_result
@@ -16,6 +16,7 @@ from util.loginrequired import check_request_parmes, client_login_required
 from util.middleware import getHost
 
 
+@check_request_parmes()
 def qrcode_login_check(request):
     """
     sessionid 在成功后返回给 客户端
@@ -76,6 +77,7 @@ def qrcode_login_scan(request, cache_key, state):
     return get_result(True, "", {"state": "ok"})
 
 
+@check_request_parmes()
 def qrcode_login_string(request):
     """
     生成登录二维码数值
@@ -97,8 +99,6 @@ def qrcode_login_string(request):
     parms = {"p": p}
     text = "http://%s/sys/qrcode2?%s" % (getHost(), urlencode(parms))
     return get_result(True, '', {"text": text})
-
-
 
 #
 # @check_request_parmes(p=("扫码值", 'r'))

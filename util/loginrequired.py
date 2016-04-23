@@ -224,6 +224,9 @@ def check_response_results(**checks):
             else:
                 response_type = 'dict'
             if isinstance(response, JSONHttpResponse):
+                # 如果接口返回不成功,则不校验返回值
+                if not response.json['success']:
+                    return response
                 result = response.json['result']
                 data = None
                 if isinstance(result, dict):

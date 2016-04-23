@@ -4,10 +4,10 @@
 # file:app_config.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
+import cStringIO
 import os
 import time
 
-import cStringIO
 from django import http
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -23,6 +23,7 @@ except:
     pass
 
 
+@check_request_parmes()
 def logout(request):
     """
     退出账号
@@ -35,6 +36,7 @@ def logout(request):
     return get_result(True, '')
 
 
+@check_request_parmes()
 def check_login(request):
     """
     检查是否登录
@@ -150,6 +152,7 @@ def simple_login(request, username, password):
     return get_result(True, u'登录成功', {"sessionid": sessionid})
 
 
+@check_request_parmes()
 def sync_cookie(request):
     """
     同步cookie
@@ -271,6 +274,7 @@ def send_sms_code(request, tel):
 
 
 @client_login_required
+@check_request_parmes()
 def my_userinfo(request):
     """
     获取我的个人信息

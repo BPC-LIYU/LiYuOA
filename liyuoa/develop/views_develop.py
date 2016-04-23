@@ -9,6 +9,7 @@ from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, check_response_results
 
 
+@check_request_parmes()
 def query_all_app(request):
     """
     查询所有的app list信息
