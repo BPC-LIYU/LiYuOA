@@ -7,12 +7,16 @@
 from liyuoa.models import AppApi, AppInfo, AppApiCareUser, AppApiParameter, AppApiComment, AppApiResponse
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, check_response_results
+from util.model_tools import page_obj_query
 
 
-@check_request_parmes()
-def query_all_app(request):
+@check_request_parmes(page_index=("页码", "int", 1), page_size=("页长度", "int", 1000))
+@check_response_results(apilist=("接口列表", "list"), flag=("应用flag", ""), id=("应用id", "int"), name=("接口名字", ""), type_flag=("应用类型", ""))
+def query_all_app_list(request, page_index, page_size):
     """
     查询所有的app list信息
+    :param page_size:
+    :param page_index:
     :param request:
     :param :
     :return:
@@ -40,7 +44,7 @@ def query_all_app(request):
         if api_dict.has_key(apicare['api_id']):
             apicare['api_id']['is_confirm'] = True
 
-    return get_result(True, u'', app_list)
+    return get_result(True, u'', page_obj_query(app_list, page_index, page_size))
 
 
 @check_request_parmes(app_id=("应用id", 'int'), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))

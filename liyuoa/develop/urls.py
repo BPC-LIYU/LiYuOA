@@ -9,7 +9,7 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('liyuoa.develop',
-                       url('^query_all_app$', 'views_develop.query_all_app'),
+                       url('^query_all_app_list$', 'views_develop.query_all_app_list'),
                        url('^query_api_list$', 'views_develop.query_api_list'),
                        url('^query_api_detail_list$', 'views_develop.query_api_detail_list'),
                        url('^query_appinfo_list$', 'views_develop.query_appinfo_list'),
