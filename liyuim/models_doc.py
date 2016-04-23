@@ -43,6 +43,7 @@ class ChatMessage(mongoengine.Document):
     fclient_id = mongoengine.StringField(max_length=50, verbose_name="发送方clientid")
     fdevice_id = mongoengine.StringField(max_length=50, verbose_name="发送方设备id")
     tuser = mongoengine.IntField(verbose_name="接收方")
+    target_type = mongoengine.IntField(verbose_name="聊天对象类型", help_text="0:用户;2:系统")
     time = mongoengine.IntField(verbose_name="时间戳")
     ctype = mongoengine.IntField(default=0, verbose_name="消息类型")
     is_read = mongoengine.BooleanField(default=False, verbose_name="已读")
