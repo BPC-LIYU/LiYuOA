@@ -12,11 +12,12 @@ from django.core.cache import cache
 from django.utils.crypto import get_random_string
 
 from util.jsonresult import get_result
-from util.loginrequired import check_request_parmes, client_login_required
+from util.loginrequired import check_request_parmes, client_login_required, check_response_results
 from util.middleware import getHost
 
 
 @check_request_parmes()
+@check_response_results(state=("逻辑状态", ""))
 def qrcode_login_check(request):
     """
     sessionid 在成功后返回给 客户端
@@ -53,6 +54,7 @@ def qrcode_login_check(request):
 
 
 @check_request_parmes(cache_key=("缓存键", 'r'), state=("逻辑状态", 'r'))
+@check_response_results(state=("逻辑状态", ""))
 @client_login_required
 def qrcode_login_scan(request, cache_key, state):
     """
@@ -78,6 +80,7 @@ def qrcode_login_scan(request, cache_key, state):
 
 
 @check_request_parmes()
+@check_response_results(text=("二维码数值", ""))
 def qrcode_login_string(request):
     """
     生成登录二维码数值

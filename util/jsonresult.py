@@ -39,6 +39,7 @@ class JSONHttpResponse(HttpResponse):
     def __init__(self, json_data=None, *args, **kwargs):
         super(JSONHttpResponse, self).__init__(*args, **kwargs)
         self.json = json_data
+        self.is_response_suggest = True
 
 
 def is_success_mongodb_result(result):

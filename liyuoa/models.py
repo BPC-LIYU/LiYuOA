@@ -137,7 +137,7 @@ class AppApiResponse(BaseModel):
         detail_json = ['create_time', 'is_active']
 
 
-class AppApiReplay(BaseModel):
+class AppApiComment(BaseModel):
     """
     接口修改 或 对接口的评论
     by:王健 at:2016-04-20
@@ -146,13 +146,13 @@ class AppApiReplay(BaseModel):
     content = models.TextField(verbose_name=u'修改内容,或评论内容')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, verbose_name=u'隶属用户')
     username = models.CharField(max_length=30, verbose_name=u'匿名昵称')
-    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name='api_to_replay', verbose_name=u'隶属用户')
-    to_replay = models.ForeignKey('AppApiReplay', null=True, verbose_name=u'父级评论')
+    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name='api_to_comment', verbose_name=u'隶属用户')
+    to_comment = models.ForeignKey('AppApiComment', null=True, verbose_name=u'父级评论')
     source = models.IntegerField(default=0, verbose_name=u'0:修改注释;1:文档自动对比;2:人工评论')
     attachments = models.ManyToManyField('nsbcs.NsFile', verbose_name=u'附件')
 
     class Meta:
         list_json = ['content', 'user_id', 'id', 'api_id', 'user__realname', 'user__icon_url', 'to_user__realname',
-                     'to_user__icon_url', 'create_time', 'to_replay_id', 'to_replay__content', 'to_replay__user_id',
-                     'to_replay__user__icon_url', 'to_replay__user__realname', 'source', 'username']
+                     'to_user__icon_url', 'create_time', 'to_comment_id', 'to_comment__content', 'to_comment__user_id',
+                     'to_comment__user__icon_url', 'to_comment__user__realname', 'source', 'username']
         detail_json = ['is_active']

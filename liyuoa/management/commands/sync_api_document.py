@@ -186,12 +186,12 @@ def save_fun_doc(api, doclist):
     :param doclist:
     :return:
     """
-    from liyuoa.models import AppApiReplay
+    from liyuoa.models import AppApiComment
     # 代码修改记录 保存入评论表
     try:
-        last_replay = AppApiReplay.objects.filter(api=api, source=0).order_by('-id')[0]
+        last_comment = AppApiComment.objects.filter(api=api, source=0).order_by('-id')[0]
     except:
-        last_replay = None
+        last_comment = None
     dl = []
     d_start = 0
     for i, line in enumerate(doclist):
@@ -199,27 +199,27 @@ def save_fun_doc(api, doclist):
             d_start = i
         if line.strip().find('by:') == 0:
             dl.append((i, [x.strip() for x in line.replace('by:', '').split('at:') if x]))
-    replay_dict_list = []
+    comment_dict_list = []
 
     # 找到最后保存的一个代码修改评论
-    replay_index = 0
+    comment_index = 0
     for i, (line_index, auth_arr) in enumerate(dl):
         line = ''.join(doclist[d_start:line_index])
         auth = auth_arr[0]
         date = datetime.datetime.strptime(auth_arr[1], '%Y-%m-%d')
-        replay_dict_list.append({"content": line, "auth": auth, "date": date})
+        comment_dict_list.append({"content": line, "auth": auth, "date": date})
         d_start = line_index + 1
-        if last_replay and last_replay.content == line:
-            replay_index = i
+        if last_comment and last_comment.content == line:
+            comment_index = i
 
     # 从最后一个修改评论开始新建
-    for i in range(replay_index, len(replay_dict_list)):
-        a = AppApiReplay()
+    for i in range(comment_index, len(comment_dict_list)):
+        a = AppApiComment()
         a.api = api
-        a.content = replay_dict_list[i]['content']
-        a.username = replay_dict_list[i]['auth']
+        a.content = comment_dict_list[i]['content']
+        a.username = comment_dict_list[i]['auth']
         a.source = 0
-        a.create_time = replay_dict_list[i]['date']
+        a.create_time = comment_dict_list[i]['date']
         a.save()
 
 

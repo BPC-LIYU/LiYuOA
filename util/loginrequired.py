@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.paginator import Page
 from django.db.models import QuerySet
 
+from liyuoa.models import AppApiResponse
 from util.jsonresult import get_result, JSONHttpResponse
 
 __author__ = u'王健'
@@ -155,7 +156,7 @@ def check_request_parmes(**checks):
                 return get_result(False, ','.join(errors), None)
             if settings.DEBUG:
                 response = func(request, *args, **kwargs)
-                if isinstance(response, JSONHttpResponse):
+                if isinstance(response, JSONHttpResponse) and response.is_response_suggest:
                     result = response.json['result']
                     data = None
                     if isinstance(result, dict):
@@ -173,22 +174,32 @@ def check_request_parmes(**checks):
                     if data:
                         fun_str = []
                         for key, value in data.items():
+                            try:
+                                if key != 'id':
+                                    apiresponse = AppApiResponse.objects.filter(name=key, is_active=True,
+                                                                                api__is_active=True,
+                                                                                api__app__is_active=True)[0]
+                                    title = apiresponse.title
+                                else:
+                                    title = ''
+                            except IndexError:
+                                title = ''
                             if isinstance(value, int):
-                                fun_str.append('%s=("", "int")' % key)
+                                fun_str.append('%s=("%s", "int")' % (key, title))
                             elif isinstance(value, datetime.datetime):
-                                fun_str.append('%s=("", "datetime")' % key)
+                                fun_str.append('%s=("%s", "datetime")' % (key, title))
                             elif isinstance(value, datetime.date):
-                                fun_str.append('%s=("", "date")' % key)
+                                fun_str.append('%s=("%s", "date")' % (key, title))
                             elif isinstance(value, datetime.time):
-                                fun_str.append('%s=("", "time")' % key)
+                                fun_str.append('%s=("%s", "time")' % (key, title))
                             elif isinstance(value, (list, QuerySet)):
-                                fun_str.append('%s=("", "list")' % key)
+                                fun_str.append('%s=("%s", "list")' % (key, title))
                             elif isinstance(value, dict):
-                                fun_str.append('%s=("", "dict")' % key)
+                                fun_str.append('%s=("%s", "dict")' % (key, title))
                             elif key.rfind('_id') == len(key) - 3:
-                                fun_str.append('%s=("", "int")' % key)
+                                fun_str.append('%s=("%s", "int")' % (key, title))
                             else:
-                                fun_str.append('%s=("", "")' % key)
+                                fun_str.append('%s=("%s", "")' % (key, title))
                         fun_str.sort()
                         print "%s——@check_response_results(%s)" % (request.META.get('PATH_INFO'), ', '.join(fun_str))
                         print ''
@@ -262,9 +273,11 @@ def check_response_results(**checks):
                             error, v = request_parmes_value_check(name, value, check)
                             if error:
                                 errors.append(error)
-                    lkey = list(set(checks.keys()) - set(data.keys()))
+                    lkey = list(set(data.keys()) - set(checks.keys()))
                     if lkey:
-                        errors.append('缺少字段:%s' % ','.join(lkey))
+                        errors.append('缺少字段校验:%s' % ','.join(lkey))
+                    if len(checks) > 0 and len(errors) == 0:
+                        response.is_response_suggest = False
             if errors:
                 return get_result(False, '%s:%s' % (url, ','.join(errors)), None)
             return response

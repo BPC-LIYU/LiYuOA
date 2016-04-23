@@ -17,5 +17,5 @@ urlpatterns = patterns('liyuoa.develop',
                        url('^query_appcareuser_list$', 'views_develop.query_appcareuser_list'),
                        url('^get_api$', 'views_develop.get_api'),
                        url('^get_api_detail$', 'views_develop.get_api_detail'),
-                       url('^query_apireplay_list$', 'views_develop.query_apireplay_list'),
+                       url('^query_apicomment_list$', 'views_develop.query_apicomment_list'),
                        )

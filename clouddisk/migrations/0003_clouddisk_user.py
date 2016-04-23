@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('clouddisk', '0002_auto_20160421_1007'),
+        ('clouddisk', '0002_auto_20160423_0940'),
     ]
 
     operations = [

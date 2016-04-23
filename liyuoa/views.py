@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 
 from util.jsonresult import get_result
-from util.loginrequired import check_request_parmes, client_login_required
+from util.loginrequired import check_request_parmes, client_login_required, check_response_results
 from util.tools import getUserIconUrl
 
 try:
@@ -37,6 +37,7 @@ def logout(request):
 
 
 @check_request_parmes()
+@check_response_results(has_login=("是否需要登录", "int"), sessionid=("sessionid", ""))
 def check_login(request):
     """
     检查是否登录
@@ -273,8 +274,13 @@ def send_sms_code(request, tel):
     return get_result(True, u'发送验证码成功')
 
 
-@client_login_required
 @check_request_parmes()
+@check_response_results(date_joined=("加入时间", "datetime"), email=("电子邮件", ""), icon_url=("头像url", ""),
+                        id=("用户id", "int"),
+                        imusername=("即时通信用户名", ""), is_active=("是否可用", "int"), is_staff=("是否管理员", "int"),
+                        realname=("真实姓名", ""),
+                        username=("用户名", ""))
+@client_login_required
 def my_userinfo(request):
     """
     获取我的个人信息
