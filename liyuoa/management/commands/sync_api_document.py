@@ -196,7 +196,7 @@ def save_fun_doc(api, doclist):
     d_start = 0
     for i, line in enumerate(doclist):
         if line.strip().find(':return:') == 0:
-            d_start = i
+            d_start = i+1
         if line.strip().find('by:') == 0:
             dl.append((i, [x.strip() for x in line.replace('by:', '').split('at:') if x]))
     comment_dict_list = []
@@ -210,7 +210,7 @@ def save_fun_doc(api, doclist):
         comment_dict_list.append({"content": line, "auth": auth, "date": date})
         d_start = line_index + 1
         if last_comment and last_comment.content == line:
-            comment_index = i
+            comment_index = i+1
 
     # 从最后一个修改评论开始新建
     for i in range(comment_index, len(comment_dict_list)):

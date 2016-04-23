@@ -22,6 +22,8 @@ def query_all_app_list(request, page_index, page_size):
     :return:
     查询所有的app list信息
     by:王健 at:2016-04-21
+    改造成分页返回值
+    by:王健 at:2016-04-23
     """
     query_app = AppInfo.objects.list_json().filter(is_active=True).order_by('name')
     app_list = []
