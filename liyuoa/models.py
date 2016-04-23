@@ -30,6 +30,10 @@ class LYUser(AbstractUser, JSONBaseMixin, ModefyMixin):
     def __unicode__(self):
         return u'$s#%s' % (self.pk, self.realname)
 
+    def save(self, **kwargs):
+        super(LYUser, self).save(**kwargs)
+        self.clean_old()
+
 
 class AppInfo(BaseModel):
     """
@@ -75,10 +79,11 @@ class AppApi(BaseModel):
     namespace = models.CharField(max_length=150, db_index=True, verbose_name=u'函数目录')
     update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
     code_content = models.TextField(verbose_name=u'代码')
+    response_type = models.CharField(max_length=10, default='', blank=True, verbose_name=u'返回值类型')
 
     class Meta:
         list_json = ['name', 'url', 'id', 'namespace', 'update_time']
-        detail_json = ['create_time', 'is_active', 'code_content']
+        detail_json = ['create_time', 'is_active', 'code_content', 'response_type']
 
 
 class AppApiCareUser(BaseModel):
@@ -112,6 +117,23 @@ class AppApiParameter(BaseModel):
 
     class Meta:
         list_json = ['name', 'title', 'id', 'parm_type', 'is_required', 'update_time', 'api_id', 'desc', 'default']
+        detail_json = ['create_time', 'is_active']
+
+
+class AppApiResponse(BaseModel):
+    """
+    接口参数
+    by:王健 at:2016-04-20
+    """
+    api = models.ForeignKey(AppApi, verbose_name=u'隶属api')
+    name = models.CharField(max_length=30, db_index=True, verbose_name=u'字段名')
+    title = models.CharField(max_length=20, verbose_name=u'字段中文名')
+    desc = models.CharField(max_length=100, verbose_name=u'字段备注')
+    value_type = models.CharField(max_length=10, verbose_name=u'数值类型')
+    update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
+
+    class Meta:
+        list_json = ['name', 'title', 'id', 'value_type', 'update_time', 'api_id', 'desc']
         detail_json = ['create_time', 'is_active']
 
 

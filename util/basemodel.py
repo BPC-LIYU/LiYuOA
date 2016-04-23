@@ -165,6 +165,15 @@ class ModefyMixin(object):
                 diff_attr[key] = (value, getattr(self, key, None))
         return False, diff_attr
 
+    def clean_old(self):
+        """
+        清除比较数据
+        by:王健 at:2016-04-23
+        :return:
+        """
+        if getattr(self, '_old', None) is not None:
+            del self._old
+
 
 class BaseModel(models.Model, JSONBaseMixin, ModefyMixin):
     """
@@ -186,3 +195,7 @@ class BaseModel(models.Model, JSONBaseMixin, ModefyMixin):
             return u'$s#%s' % (self.pk, self.name)
         else:
             raise Exception(u'需要重载 __unicode__ 函数')
+
+    def save(self, **kwargs):
+        super(BaseModel, self).save(**kwargs)
+        self.clean_old()

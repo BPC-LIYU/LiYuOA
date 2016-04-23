@@ -207,28 +207,45 @@ def check_response_results(**checks):
     by:王健 at:2016-04-22
     :param checks:检测条件 例如:校验项目id不能为空 @check_response_results(project_id=('项目iD', 'r'))
     :return:
+    url以_list结尾时,返回值必须是数组
+    by:王健 at:2016-04-23
     """
 
     def check_response_results_func(func=None):
         def check_response(request, *args, **kwargs):
 
             response = func(request, *args, **kwargs)
+            if not settings.DEBUG:
+                return response
+            errors = []
+            url = request.META.get('PATH_INFO')
+            if url.rfind('_list') == len(url) - 5:
+                response_type = 'list'
+            else:
+                response_type = 'dict'
             if isinstance(response, JSONHttpResponse):
-                errors = []
                 result = response.json['result']
                 data = None
                 if isinstance(result, dict):
                     if result.has_key('list') and result.has_key('page_index') and result.has_key('page_count'):
                         if len(result['list']) > 0:
                             data = result['list'][0]
+                            if response_type != 'list':
+                                errors.append('返回值为list,但是url没有以_list结尾')
                     else:
                         data = result
+                        if response_type != 'dict':
+                            errors.append('返回值为dict,但是url却以_list结尾')
                 elif isinstance(result, Page):
                     if len(result) > 0:
                         data = result[0]
+                        if response_type != 'list':
+                            errors.append('返回值为list,但是url没有以_list结尾')
                 elif isinstance(result, list):
                     if len(result) > 0:
                         data = result[0]
+                        if response_type != 'list':
+                            errors.append('返回值为list,但是url没有以_list结尾')
                 if data:
                     for key, parm in checks.items():
                         name = parm[0]
@@ -245,8 +262,8 @@ def check_response_results(**checks):
                     lkey = list(set(checks.keys()) - set(data.keys()))
                     if lkey:
                         errors.append('缺少字段:%s' % ','.join(lkey))
-                if errors:
-                    return get_result(False, ','.join(errors), None)
+            if errors:
+                return get_result(False, '%s:%s' % (url, ','.join(errors)), None)
             return response
 
         return check_response

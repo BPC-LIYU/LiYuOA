@@ -25,8 +25,12 @@ class Command(BaseCommand):
                 a = fun.split('.')
                 fun_name = a[-1]
                 fun_path = os.path.join(settings.BASE_DIR, *a[:-1])
-                check, doclist, code = get_fun_info(fun_path, fun_name)
-                save_fun_info(url, fun_name, fun_path, check, doclist, code)
+                check, response_check, doclist, code = get_fun_info(fun_path, fun_name)
+                api = save_fun_api(url, funname=fun_name, funpath=fun_path, code=code, doclist=doclist)
+                save_fun_doc(api, doclist=doclist)
+                save_fun_check(api, check=check)
+                save_fun_check_response(api, response_check=response_check)
+
                 urls.append(url)
             AppApi.objects.exclude(url__in=urls).update(is_active=False, update_time=timezone.now())
             AppApiCareUser.objects.exclude(api__url__in=urls).update(is_active=False, update_time=timezone.now())
@@ -99,6 +103,15 @@ def get_fun_info(file_path, fun_name):
             check_end = key_list[i + 1][0]
             break
 
+    # 找出结果校验的位置
+    check_response_start = 0
+    check_response_end = 0
+    for i, (index, code_first_char, code) in enumerate(key_list):
+        if code_first_char == '@' and code.find('@check_response_results') >= 0:
+            check_response_start = index
+            check_response_end = key_list[i + 1][0]
+            break
+
     # 找出doc信息的位置
     fun_doc_start = 0
     fun_doc_end = 0
@@ -117,23 +130,22 @@ def get_fun_info(file_path, fun_name):
     # for code in code_list[check_start: check_end]:
     #     check_code.append(code.strip())
     fun_check = ''.join(code_list[check_start: check_end])
+    fun_response_check = ''.join(code_list[check_response_start: check_response_end])
 
-    return fun_check, fun_doc, fun_code
+    return fun_check, fun_response_check, fun_doc, fun_code
 
 
-def save_fun_info(url, funname, funpath, check, doclist, code):
+def save_fun_api(url, funname, funpath, code, doclist):
     """
-    将当前的文档保存
-    by:王健 at:2016-04-20
+    修改保存api信息
+    :param doclist:
     :param url:
     :param funname:
     :param funpath:
-    :param check:
-    :param doc:
     :param code:
     :return:
     """
-    from liyuoa.models import AppApi, AppApiCareUser, AppInfo, AppApiParameter, AppApiReplay
+    from liyuoa.models import AppApi, AppApiCareUser, AppInfo
 
     # 新建或修改api
     if AppApi.objects.filter(url=url).exists():
@@ -156,10 +168,70 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
     api.namespace = namespace
     api.code_content = code
     api.name = doclist[0]
+    if url.rfind('_list') == len(url) - 5:
+        api.response_type = 'list'
+    else:
+        api.response_type = 'dict'
     created, diff = api.compare_old()
     if created or diff:
         api.save()
         AppApiCareUser.objects.filter(api=api).update(is_confirm=False, update_time=timezone.now())
+    return api
+
+
+def save_fun_doc(api, doclist):
+    """
+    保存接口修改的注释
+    :param api:
+    :param doclist:
+    :return:
+    """
+    from liyuoa.models import AppApiReplay
+    # 代码修改记录 保存入评论表
+    try:
+        last_replay = AppApiReplay.objects.filter(api=api, source=0).order_by('-id')[0]
+    except:
+        last_replay = None
+    dl = []
+    d_start = 0
+    for i, line in enumerate(doclist):
+        if line.strip().find(':return:') == 0:
+            d_start = i
+        if line.strip().find('by:') == 0:
+            dl.append((i, [x.strip() for x in line.replace('by:', '').split('at:') if x]))
+    replay_dict_list = []
+
+    # 找到最后保存的一个代码修改评论
+    replay_index = 0
+    for i, (line_index, auth_arr) in enumerate(dl):
+        line = ''.join(doclist[d_start:line_index])
+        auth = auth_arr[0]
+        date = datetime.datetime.strptime(auth_arr[1], '%Y-%m-%d')
+        replay_dict_list.append({"content": line, "auth": auth, "date": date})
+        d_start = line_index + 1
+        if last_replay and last_replay.content == line:
+            replay_index = i
+
+    # 从最后一个修改评论开始新建
+    for i in range(replay_index, len(replay_dict_list)):
+        a = AppApiReplay()
+        a.api = api
+        a.content = replay_dict_list[i]['content']
+        a.username = replay_dict_list[i]['auth']
+        a.source = 0
+        a.create_time = replay_dict_list[i]['date']
+        a.save()
+
+
+def save_fun_check(api, check):
+    """
+    将当前的参数校验文档保存
+    by:王健 at:2016-04-20
+    :param api:
+    :param check:
+    :return:
+    """
+    from liyuoa.models import AppApiParameter
 
     if not check:
         AppApiParameter.objects.filter(api=api).update(is_active=False)
@@ -169,7 +241,7 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
     try:
         parameter = eval(check.replace('@check_request_parmes', 'formate_parameter'))
     except:
-        print namespace, ":", check, ': error'
+        print api.namespace, ":", check, ': error'
 
     if parameter is None:
         return
@@ -178,13 +250,13 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
     parameterlist = []
     for p in AppApiParameter.objects.filter(api=api):
         p.copy_old()
+        p.is_active = False
         parameterlist.append(p)
 
     for name, value in parameter.items():
         old_parameter = False
         for p in parameterlist:
             if name == p.name:
-
                 old_parameter = True
                 title = value[0]
                 check_args = value[1].split(',')
@@ -227,41 +299,73 @@ def save_fun_info(url, funname, funpath, check, doclist, code):
                 parm_type = ','.join(check_args)
             p.parm_type = parm_type
             p.save()
+    for p in parameterlist:
+        created, diff = p.compare_old()
+        if created or diff:
+            p.save()
 
-    # 代码修改记录 保存入评论表
-    try:
-        last_replay = AppApiReplay.objects.filter(api=api, source=0).order_by('-id')[0]
-    except:
-        last_replay = None
-    dl = []
-    d_start = 0
-    for i, line in enumerate(doclist):
-        if line.strip().find(':return:') == 0:
-            d_start = i
-        if line.strip().find('by:') == 0:
-            dl.append((i, [x.strip() for x in line.replace('by:', '').split('at:') if x]))
-    replay_dict_list = []
 
-    # 找到最后保存的一个代码修改评论
-    replay_index = 0
-    for i, (line_index, auth_arr) in enumerate(dl):
-        line = ''.join(doclist[d_start:line_index])
-        auth = auth_arr[0]
-        date = datetime.datetime.strptime(auth_arr[1], '%Y-%m-%d')
-        replay_dict_list.append({"content": line, "auth": auth, "date": date})
-        d_start = line_index + 1
-        if last_replay and last_replay.content == line:
-            replay_index = i
+def save_fun_check_response(api, response_check):
+    """
+    将当前的返回值校验保存
+    by:王健 at:2016-04-20
+    :param api:
+    :param response_check:
+    :return:
+    """
+    from liyuoa.models import AppApiResponse
 
-    # 从最后一个修改评论开始新建
-    for i in range(replay_index, len(replay_dict_list)):
-        a = AppApiReplay()
-        a.api = api
-        a.content = replay_dict_list[i]['content']
-        a.username = replay_dict_list[i]['auth']
-        a.source = 0
-        a.create_time = replay_dict_list[i]['date']
-        a.save()
+    if not response_check:
+        AppApiResponse.objects.filter(api=api).update(is_active=False)
+        return
+    # 参数解析成字典
+    parameter = eval(response_check.replace('@check_response_results', 'formate_parameter'))
+
+    if parameter is None:
+        return
+
+    # 新建或修改参数
+    parameterlist = []
+    for p in AppApiResponse.objects.filter(api=api):
+        p.copy_old()
+        p.is_active = False
+        parameterlist.append(p)
+
+    for name, value in parameter.items():
+        old_parameter = False
+        for p in parameterlist:
+            if name == p.name:
+                old_parameter = True
+                title = value[0]
+                check_args = value[1].split(',')
+                p.title = title
+                if check_args:
+                    p.response_type = ','.join(check_args)
+                else:
+                    p.response_type = '字符串'
+                p.is_active = True
+                created, diff = p.compare_old()
+                if created or diff:
+                    p.save()
+                parameterlist.remove(p)
+                break
+
+        if not old_parameter:
+            title = value[0]
+            check_args = value[1].split(',')
+            p = AppApiResponse()
+            p.api = api
+            p.name = name
+            p.title = title
+            if check_args:
+                p.response_type = ','.join(check_args)
+            else:
+                p.response_type = '字符串'
+            p.save()
+    for p in parameterlist:
+        created, diff = p.compare_old()
+        if created or diff:
+            p.save()
 
 
 def formate_parameter(**kwargs):
