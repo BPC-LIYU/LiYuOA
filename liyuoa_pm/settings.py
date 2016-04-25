@@ -39,6 +39,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 ENVIRONMENT = 'aliyun'
+if 'SERVER_SOFTWARE' in os.environ:
+    ENVIRONMENT = 'baidu'
 
 # Application definition
 
