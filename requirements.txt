@@ -17,6 +17,5 @@ raven<6
 phonenumbers
 Pillow>=2.0.0
 coverage==3.5
-wechat-sdk
 django-redis-sessions
 django-redis-cache

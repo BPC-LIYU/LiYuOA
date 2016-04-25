@@ -17,8 +17,8 @@ from django.core.cache import cache
 import phonenumbers
 from raven import Client
 import requests
-from wechat_sdk import WechatBasic
-from wechat_sdk.exceptions import OfficialAPIError
+# from wechat_sdk import WechatBasic
+# from wechat_sdk.exceptions import OfficialAPIError
 from util import demjson
 from django.utils.http import urlencode
 
@@ -79,13 +79,13 @@ def getCachedAccessWechatObj(appID=None, appSecret=None, token=None):
         else:
             access_token = None
             access_token_expires_at = None
-        wechatObj = WechatBasic(token=token, appid=appID, appsecret=appSecret,
-                                access_token=access_token,
-                                access_token_expires_at=access_token_expires_at)
-        access_token_info = wechatObj.get_access_token()  # 检测access_token,更新access_token
+        # wechatObj = WechatBasic(token=token, appid=appID, appsecret=appSecret,
+        #                         access_token=access_token,
+        #                         access_token_expires_at=access_token_expires_at)
+        # access_token_info = wechatObj.get_access_token()  # 检测access_token,更新access_token
         cache.set('access_token_info_%s' % appID, access_token_info)
-        return wechatObj
-    except OfficialAPIError:
+        # return wechatObj
+    except :
         common_except_log()
         return None
     finally:

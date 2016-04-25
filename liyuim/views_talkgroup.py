@@ -291,13 +291,13 @@ def reject_talkapply(request, talkapply_id, reply):
 @check_group_relation
 def add_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
     """
-    拉人入群
+    添加管理员
     :param talkuser:
     :param user_id:
     :param request:
     :param talkgroup_id:
     :return:
-    拉人入群
+    添加管理员
     by:王健 at:2016-04-25
     """
     if talkuser.talkgroup.owner_id != request.user.id:
@@ -339,4 +339,83 @@ def remove_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
     except TalkUser.DoesNotExist:
         return get_result(False, u'只有成员才能被取消管理员身份')
 
-# todo:\转让群\修改别人的群昵称\设置我的群属性(昵称\免扰)
+
+@check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"))
+@client_login_required
+@check_group_relation
+def transfer_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
+    """
+    转让群
+    :param talkuser:
+    :param user_id:
+    :param request:
+    :param talkgroup_id:
+    :return:
+    拉人入群
+    by:王健 at:2016-04-25
+    """
+    if talkuser.talkgroup.owner_id != request.user.id:
+        return get_result(False, u'只有群主才能转让群')
+    try:
+        member = TalkUser.objects.get(talkgroup_id=talkgroup_id, user_id=user_id, is_active=True)
+        talkgroup = talkuser.talkgroup
+        talkgroup.copy_old()
+        talkgroup.owner = member
+        talkgroup.compare_old()
+        talkgroup.save()
+        return get_result(True, u'转让群成功')
+    except TalkUser.DoesNotExist:
+        return get_result(False, u'只有群主才能转让群')
+
+
+@check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"), nickname=("昵称", "r"))
+@client_login_required
+@check_group_relation
+def update_nick_in_talkgroup(request, talkgroup_id, user_id, nickname, talkuser):
+    """
+    转让群
+    :param talkuser:
+    :param user_id:
+    :param request:
+    :param talkgroup_id:
+    :return:
+    拉人入群
+    by:王健 at:2016-04-25
+    """
+    if talkuser.talkgroup.owner_id != request.user.id and talkuser.role != 1:
+        return get_result(False, u'只有群主和管理员才能修改别人的昵称')
+    try:
+        member = TalkUser.objects.get(talkgroup_id=talkgroup_id, user_id=user_id, is_active=True)
+        member.copy_old()
+        member.nickname = nickname
+        member.compare_old()
+        member.save()
+        return get_result(True, u'修改昵称成功')
+    except TalkUser.DoesNotExist:
+        return get_result(False, u'该用户不是群成员')
+
+
+@check_request_parmes(talkgroup_id=("群id", "r,int"), nickname=("昵称", "r"), is_muted=("是否免打扰", "b"))
+@client_login_required
+@check_group_relation
+def update_info_in_talkgroup(request, talkgroup_id, is_muted, nickname, talkuser):
+    """
+    修改自己的群属性
+    :param talkuser:
+    :param user_id:
+    :param request:
+    :param talkgroup_id:
+    :return:
+    修改自己的群属性
+    by:王健 at:2016-04-25
+    """
+    talkuser.copy_old()
+    talkuser.nickname = nickname
+    talkuser.is_muted = is_muted
+    talkuser.compare_old()
+    talkuser.save()
+    return get_result(True, u'修改群属性成功')
+
+
+
+# todo:\设置我的群属性(昵称\免扰)

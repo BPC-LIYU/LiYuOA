@@ -1,6 +1,7 @@
 # coding=utf-8
 # Date: 11-12-8
 #Time: 下午10:28
+from django.conf import settings
 
 __author__ = u'王健'
 import threading
@@ -8,9 +9,7 @@ import threading
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 
-from CalendarOA.settings import EMAIL_HOST_EMAIL
-
-from_email = EMAIL_HOST_EMAIL
+from_email = settings.EMAIL_HOST_EMAIL
 
 
 class EmailThread(threading.Thread):
