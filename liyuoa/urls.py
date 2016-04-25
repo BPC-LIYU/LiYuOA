@@ -10,7 +10,6 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('liyuoa',
                        url('^logout$', 'views.logout'),
-                       url('^login$', 'views.login'),
                        url('^check_login$', 'views.check_login'),
                        url('^reg_user$', 'views.reg_user'),
                        url('^simple_login$', 'views.simple_login'),

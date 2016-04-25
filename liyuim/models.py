@@ -37,11 +37,12 @@ class Friend(BaseModel):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='friendowner', null=True, verbose_name=u'好友')
     update_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
     is_black = models.BooleanField(default=False, verbose_name=u'是否黑名单')
-    is_muted = models.BooleanField(default=True, verbose_name=u'是否静音')
+    is_muted = models.BooleanField(default=False, verbose_name=u'是否静音')
 
     class Meta:
-        list_json = ['user_id', 'user__realname', 'user__icon_url', 'nickname', 'id', 'is_muted', 'owner_id',
-                     'group_id', 'update_time']
+        unique_together = (('friend', 'owner'),)
+        list_json = ['friend_id', 'friend__realname', 'friend__icon_url', 'nickname', 'id', 'owner_id',
+                     'group_id', 'update_time', 'is_black']
         detail_json = ['create_time', 'is_active']
 
 
@@ -70,12 +71,13 @@ class TalkGroup(BaseModel):
     name = models.CharField(max_length=30, verbose_name=u'群名称')
     max_member_count = models.IntegerField(default=100, verbose_name=u'成员数限制')
     group_type = models.IntegerField(default=0, verbose_name=u'群类型', help_text=u'0:普通群;1:企业群;2:企业部门;3:讨论组')
-    flag = models.CharField(max_length=50, verbose_name=u'群成员md5')
+    is_add = models.BooleanField(default=True, verbose_name=u'成员是否可自由加人')
+    flag = models.CharField(max_length=50, db_index=True, verbose_name=u'群成员md5')
     icon_url = models.CharField(max_length=255, null=True, verbose_name=u'群头像')
 
     class Meta:
-        list_json = ['owner_id', 'owner__realname', 'owner__icon_url', 'name', 'id', 'member_num', 'group_type',
-                     'icon_url']
+        list_json = ['owner_id', 'owner__realname', 'owner__icon_url', 'name', 'id', 'max_member_count', 'group_type',
+                     'icon_url', 'is_add']
         detail_json = ['create_time', 'is_active']
 
 
@@ -84,15 +86,15 @@ class TalkUser(BaseModel):
     群成员
     by:王健 at:2016-04-23
     """
-    talk = models.ForeignKey(TalkGroup, verbose_name=u'群')
+    talkgroup = models.ForeignKey(TalkGroup, verbose_name=u'群')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=u'群成员')
     nickname = models.CharField(max_length=30, verbose_name=u'群名片')
     role = models.IntegerField(default=0, verbose_name=u'群角色', help_text=u'0:成员;1:管理员;')
-    read_tiemline = models.IntegerField(default=0, verbose_name=u'已读时间戳')
-    is_muted = models.BooleanField(default=True, verbose_name=u'是否静音')
+    read_timeline = models.IntegerField(default=0, verbose_name=u'已读时间戳')
+    is_muted = models.BooleanField(default=False, verbose_name=u'是否静音')
 
     class Meta:
-        list_json = ['id', 'user__realname', 'user__icon_url', 'nickname', 'role', 'is_muted', 'read_timeline']
+        list_json = ['id', 'talkgroup_id', 'user__realname', 'user__icon_url', 'nickname', 'role', 'is_muted', 'read_timeline']
         detail_json = ['create_time', 'is_active']
 
 
@@ -116,14 +118,14 @@ class TalkApply(BaseModel):
     by:王健 at:2016-04-23
     """
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=u'申请发出人')
-    talk = models.ForeignKey(TalkGroup, verbose_name=u'申请群')
+    talkgroup = models.ForeignKey(TalkGroup, verbose_name=u'申请群')
     status = models.IntegerField(default=0, db_index=True, verbose_name=u'状态', help_text=u'0:未处理,1:同意,2:拒绝')
     content = models.CharField(max_length=50, verbose_name=u'申请信息')
     reply = models.CharField(max_length=50, verbose_name=u'处理信息')
     checker = models.ForeignKey(TalkUser, null=True, verbose_name=u'处理人')
 
     class Meta:
-        list_json = ['id', 'talk_id', 'talk__icon_url', 'talk__name', 'status', 'content', 'reply', 'checker_id',
+        list_json = ['id', 'talkgroup_id', 'talkgroup__icon_url', 'talkgroup__name', 'status', 'content', 'reply', 'checker_id',
                      'checker__nickname', 'checker__user__icon_url']
         detail_json = ['create_time', 'is_active']
 

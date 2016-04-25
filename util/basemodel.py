@@ -93,7 +93,27 @@ class JSONBaseMixin(object):
     by:王健 at:2016-04-21
     """
 
-    def toJSON(self, ex_parm=None, un_parm=None):
+    def __init__(self):
+        self.un_parm = None
+        self.ex_parm = None
+        self.ex_attr = None
+
+    def pre_json(self, ex_parm=None, un_parm=None):
+        self.un_parm = un_parm
+        self.ex_parm = ex_parm
+
+    def extend(self, attrs=None, **kwargs):
+        if self.ex_attr is None:
+            self.ex_attr = {}
+        if attrs is not None:
+            if isinstance(attrs, dict):
+                self.ex_attr.update(attrs)
+            else:
+                raise Exception("res 参数只能是字典")
+        if kwargs:
+            self.ex_attr.update(kwargs)
+
+    def toJSON(self):
         """
         序列化成 dict类型
         by:王健 at:2015-1-29
@@ -109,23 +129,26 @@ class JSONBaseMixin(object):
         by: 魏璐 at:2016-02-24
         :return:
         """
-        if ex_parm is None:
-            ex_parm = []
-        ex_parm.extend(self._meta.list_json)
-        ex_parm.extend(self._meta.detail_json)
-        ex_parm = set(ex_parm)
-        if un_parm is not None:
-            for p in un_parm:
-                ex_parm.remove(p)
-        ex_parm = list(ex_parm)
-        ex_parm.sort()
+
+        if self.ex_parm is None:
+            self.ex_parm = []
+        self.ex_parm.extend(self._meta.list_json)
+        self.ex_parm.extend(self._meta.detail_json)
+        self.ex_parm = set(self.ex_parm)
+        if self.un_parm is not None:
+            for p in self.un_parm:
+                self.ex_parm.remove(p)
+        self.ex_parm = list(self.ex_parm)
+        self.ex_parm.sort()
 
         d = {}
-        for attr in ex_parm:
+        for attr in self.ex_parm:
             if getattr(self, attr, None) is None:
                 d[attr] = None
             else:
                 d[attr] = getattr(self, attr)
+        if self.ex_attr:
+            d.update(self.ex_attr)
         return d
 
 
@@ -145,6 +168,7 @@ class ModefyMixin(object):
             if getattr(self, '_old', None) is not None:
                 raise Exception(u'The copy_old function only be used once')
             self._old = {}
+            self.diff_attr = {}
             for field in self._meta.fields:
                 self._old[field.attname] = getattr(self, field.attname, None)
 
@@ -159,11 +183,11 @@ class ModefyMixin(object):
                 raise Exception(u'The copy_old function is not yet in use')
             else:
                 return True, {}
-        diff_attr = {}
-        for key, value in self._old.items():
-            if value != getattr(self, key, None):
-                diff_attr[key] = (value, getattr(self, key, None))
-        return False, diff_attr
+        if not self.diff_attr:
+            for key, value in self._old.items():
+                if value != getattr(self, key, None):
+                    self.diff_attr[key] = (value, getattr(self, key, None))
+        return False, self.diff_attr
 
     def clean_old(self):
         """
@@ -172,6 +196,7 @@ class ModefyMixin(object):
         :return:
         """
         if getattr(self, '_old', None) is not None:
+            del self._old
             del self._old
 
 

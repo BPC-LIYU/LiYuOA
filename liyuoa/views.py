@@ -104,32 +104,6 @@ def reg_user(request, realname, username, password, email, code):
 
 
 @check_request_parmes(username=("手机号", "r,phone"), password=(" password", "r"))
-def login(request, username, password):
-    """
-    常规登录
-    :param request:
-    :param username:
-    :param password:
-    :return:
-    常规登录 使用手机号 和 密码
-    by:王健 at:2016-04-21
-    """
-    user = authenticate(username=username, password=password)
-    if user is None:
-        return get_result(False, u'账号或密码错误')
-    if not user.is_active:
-        return get_result(False, u'用户已经停止使用。', status_code=5)
-    auth_login(request, user)
-    res = user.toJSON()
-    sessionid = request.session.session_key
-    if not sessionid:
-        request.session.save()
-        sessionid = request.session.session_key
-    res['sessionid'] = sessionid
-    return get_result(True, u'登录成功', res)
-
-
-@check_request_parmes(username=("手机号", "r,phone"), password=(" password", "r"))
 def simple_login(request, username, password):
     """
     简单登录,只返回 sessionid

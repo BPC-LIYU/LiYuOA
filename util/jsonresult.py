@@ -9,6 +9,9 @@ import datetime
 from django.core.paginator import Page
 from django.http import HttpResponse
 
+from util.basemodel import ValuesQuerySet, JSONBaseMixin
+from util.model_tools import page_obj_query
+
 __author__ = u'王健'
 
 
@@ -27,6 +30,8 @@ class LiYuEncoder(json.JSONEncoder):
             return obj.strftime(BASE_TIME_FORMATE)
         elif isinstance(obj, Page):
             return {"list": [x for x in obj.object_list], "page_index": obj.number, "page_count": obj.paginator.num_pages}
+        elif isinstance(obj, JSONBaseMixin):
+            return obj.toJSON()
         return json.JSONEncoder.default(self, obj)
 
 

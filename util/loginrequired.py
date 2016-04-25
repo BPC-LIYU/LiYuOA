@@ -101,6 +101,12 @@ def request_parmes_value_check(name, value, check):
                 return None, int(value)
             except:
                 return "%s应为整数" % name, None
+    elif check == 'b':
+        if value:
+            if value == 'true' or 'false':
+                return None, value == 'true'
+            else:
+                return "%s应为bool类型" % name, None
     elif check == '[int]':  # 逗号分隔的int值
         if value:
             try:
