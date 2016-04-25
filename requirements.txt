@@ -9,7 +9,6 @@ xlwt
 beautifulsoup4
 Jinja2
 wechat-sdk
-bson
 pymongo
 mongoengine
 mns==1.0.2
