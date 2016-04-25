@@ -43,11 +43,11 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'init.lock'),
     out_init_log('django version:' + str(django.VERSION))
     # 自动执行collectstatic
     # by: 范俊伟 at:2015-06-23
-    try:
-        execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
-        out_init_log('collectstatic complete')
-    except Exception, e:
-        out_init_log(traceback.format_exc())
+    # try:
+    #     execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
+    #     out_init_log('collectstatic complete')
+    # except Exception, e:
+    #     out_init_log(traceback.format_exc())
 
     # 自动执行syncdb
     # by: 范俊伟 at:2015-07-15
