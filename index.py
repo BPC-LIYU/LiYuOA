@@ -7,7 +7,7 @@ import traceback
 import fcntl
 import datetime
 import django
-
+print '11111111111111'
 sys.argv = [__file__]
 os.environ['DJANGO_SETTINGS_MODULE'] = 'liyuoa_pm.settings'
 
