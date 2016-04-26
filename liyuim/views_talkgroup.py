@@ -167,7 +167,7 @@ def dismiss_talkgroup(request, talkgroup_id, talkuser):
 @check_group_relation
 def remove_talkgroup(request, talkgroup_id, user_id, talkuser):
     """
-    踢出群
+    踢人出群
     :param talkuser:
     :param user_id:
     :param request:
@@ -217,13 +217,15 @@ def add_talkgroup(request, talkgroup_id, user_id, talkuser):
 @client_login_required
 def apply_talkgroup(request, talkgroup_id, content):
     """
-    拉人入群
+    申请入群
     :param content:
     :param request:
     :param talkgroup_id:
     :return:
     拉人入群
     by:王健 at:2016-04-25
+    修改接口名字
+    by:王健 at:2016-04-26
     """
 
     talkapply = TalkApply()
@@ -264,7 +266,7 @@ def pass_talkapply(request, talkapply_id):
 @client_login_required
 def reject_talkapply(request, talkapply_id, reply):
     """
-    通过入群申请
+    拒绝入群申请
     :param reply:
     :param talkapply_id:
     :param request:
@@ -318,7 +320,7 @@ def add_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
 @check_group_relation
 def remove_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
     """
-    拉人入群
+    删除管理员
     :param talkuser:
     :param user_id:
     :param request:
@@ -326,6 +328,8 @@ def remove_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
     :return:
     拉人入群
     by:王健 at:2016-04-25
+    删除管理员
+    by:王健 at:2016-04-26
     """
     if talkuser.talkgroup.owner_id != request.user.id:
         return get_result(False, u'只有群主才能删除管理员')
@@ -373,7 +377,7 @@ def transfer_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
 @check_group_relation
 def update_nick_in_talkgroup(request, talkgroup_id, user_id, nickname, talkuser):
     """
-    转让群
+    修改群成员昵称
     :param talkuser:
     :param user_id:
     :param request:
@@ -381,6 +385,8 @@ def update_nick_in_talkgroup(request, talkgroup_id, user_id, nickname, talkuser)
     :return:
     拉人入群
     by:王健 at:2016-04-25
+    修改群成员昵称
+    by:王健 at:2016-04-26
     """
     if talkuser.talkgroup.owner_id != request.user.id and talkuser.role != 1:
         return get_result(False, u'只有群主和管理员才能修改别人的昵称')
@@ -401,8 +407,9 @@ def update_nick_in_talkgroup(request, talkgroup_id, user_id, nickname, talkuser)
 def update_info_in_talkgroup(request, talkgroup_id, is_muted, nickname, talkuser):
     """
     修改自己的群属性
+    :param nickname:
+    :param is_muted:
     :param talkuser:
-    :param user_id:
     :param request:
     :param talkgroup_id:
     :return:
