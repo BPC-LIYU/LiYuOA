@@ -1,5 +1,5 @@
 
-syntax = "proto3";
+syntax = "proto2";
 
 option java_multiple_files = true;
 option java_package = "com.liyu.oa.im";
@@ -20,16 +20,16 @@ service FriendRelation {
 
 // The request message containing the user's name.
 message FriendApply {
-  int32 apply_id = 1;
-  int32 friend_id = 2;
-  int32 owner_id = 3;
-  int32 status = 4;
-  string content = 5;
+  required int32 apply_id = 1;
+  required int32 friend_id = 2;
+  required int32 owner_id = 3;
+  required int32 status = 4;
+  required string content = 5;
 }
 
 // The response message containing the greetings
 message IMResult {
-  bool success = 1;
-  string message = 2;
-  int32 status_code = 3;
+  required bool success = 1;
+  required string message = 2;
+  required int32 status_code = 3;
 }
