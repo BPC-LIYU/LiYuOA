@@ -1,4 +1,6 @@
 # coding=utf-8
+import uuid
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -17,6 +19,7 @@ class LYUser(AbstractUser, JSONBaseMixin, ModefyMixin):
     icon_url = models.URLField(verbose_name=u'图标url', null=True)
     realname = models.CharField(max_length=8, verbose_name=u'真实姓名', help_text=u'真实姓名')
     imusername = models.CharField(max_length=50, unique=True, null=True, verbose_name=u'即时通信账号', help_text=u'即时通信账号')
+    impassword = models.CharField(max_length=50, null=True, verbose_name=u'即时通信账号密码', help_text=u'即时通信账号密码')
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
@@ -25,12 +28,16 @@ class LYUser(AbstractUser, JSONBaseMixin, ModefyMixin):
 
     class Meta:
         list_json = ['realname', 'icon_url', 'id']
-        detail_json = ['username', 'imusername', 'email', 'username', 'is_active', 'is_staff', 'date_joined']
+        detail_json = ['username', 'imusername', 'impassword', 'email', 'username', 'is_active', 'is_staff', 'date_joined']
 
     def __unicode__(self):
         return u'$s#%s' % (self.pk, self.realname)
 
     def save(self, **kwargs):
+        if not self.imusername:
+            self.imusername = str(uuid.uuid4())
+        if not self.impassword:
+            self.impassword = str(uuid.uuid4())
         super(LYUser, self).save(**kwargs)
         self.clean_old()
 
