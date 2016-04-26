@@ -63,7 +63,7 @@ class Group(BaseModel):
                        'charge__user__icon_url', 'aide__realname', 'aide__user__icon_url', 'aide_id', 'aide__user_id']
 
 
-class ProjectApply(BaseModel):
+class OrgApply(BaseModel):
     """
     组织加入申请
     by:王健 at:2016-04-18
@@ -73,8 +73,7 @@ class ProjectApply(BaseModel):
                                 verbose_name=u'审核人', help_text=u'隶属项目')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=u'用户')
     content = models.CharField(max_length=100, verbose_name=u'申请')
-    status = models.NullBooleanField(default=None, db_index=True, verbose_name=u'是否同意',
-                                     help_text=u'None 未处理, True 同意，False 不同意')
+    status = models.IntegerField(default=0, db_index=True, verbose_name=u'状态', help_text=u'0:未处理,1:同意,2:拒绝')
 
     class Meta:
         list_json = ['user__realname', 'user__icon_url', 'id', 'org_id', 'status', 'content']
