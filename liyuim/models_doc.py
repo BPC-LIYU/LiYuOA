@@ -24,12 +24,18 @@ class ChatSession(mongoengine.Document):
     会话
     by:王健 at:2016-04-23
     """
+    session_id = mongoengine.StringField(max_length=64, primary_key=True, verbose_name="会话id")
     owner = mongoengine.IntField(verbose_name="回话隶属的用户")
     target = mongoengine.IntField(verbose_name="聊天对象")
     target_type = mongoengine.IntField(verbose_name="聊天对象类型", help_text="0:用户;1:群;2:系统")
     is_top = mongoengine.BooleanField(default=False, verbose_name="是否置顶")
+    nickname = mongoengine.StringField(max_length=30, verbose_name="聊天对象昵称")
+    content = mongoengine.StringField(max_length=2000, verbose_name="消息")
+    update_time = mongoengine.DateTimeField()
+    time = mongoengine.IntField(verbose_name="已读时间戳")
+
     meta = {
-        'indexes': ['owner']
+        'indexes': ['owner', 'target', 'target_type', 'is_top', 'update_time']
     }
 
 
@@ -38,6 +44,7 @@ class MessageUserRead(mongoengine.Document):
     消息已读未读
     by:王健 at:2016-04-25
     """
+    message_id = mongoengine.StringField(max_length=64, verbose_name="消息id")
     user = mongoengine.IntField(verbose_name="消息接收人")
     is_read = mongoengine.BooleanField(verbose_name="是否已读")
 
@@ -47,6 +54,7 @@ class ChatMessage(mongoengine.Document):
     接口请求计数表
     by: 范俊伟 at:2015-04-16
     """
+    message_id = mongoengine.StringField(max_length=64, primary_key=True, verbose_name="消息id")
     fuser = mongoengine.IntField(verbose_name="消息发送方")
     fnick = mongoengine.StringField(max_length=30, verbose_name="发送方昵称")
     fclient_id = mongoengine.StringField(max_length=50, verbose_name="发送方clientid")

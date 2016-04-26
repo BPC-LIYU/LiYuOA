@@ -32,6 +32,7 @@ class Command(BaseCommand):
                 save_fun_check_response(api, response_check=response_check)
 
                 urls.append(url)
+            formate_js_api()
             AppApi.objects.exclude(url__in=urls).update(is_active=False, update_time=timezone.now())
             AppApiCareUser.objects.exclude(api__url__in=urls).update(is_active=False, update_time=timezone.now())
 
@@ -368,5 +369,69 @@ def save_fun_check_response(api, response_check):
             p.save()
 
 
+def formate_js_api():
+    """
+    生成js api 接口调用代码
+    by:王健 at:2016-04-25
+    :param api:
+    :return:
+    """
+
+    jsappfun = """
+            '%s': {
+                %s
+            },
+    """
+    jsapifun = """
+                // %s
+                '%s': 'func',
+            """
+    from liyuoa.models import AppApiParameter, AppInfo
+    applist = []
+    for app in AppInfo.objects.filter(is_active=True).order_by('flag'):
+        apilist = []
+        for api in AppApi.objects.filter(app=app, is_active=True).order_by('url'):
+
+            func = api.url.split("/")[1]
+            parmlist = [' %s:%s' % (p.name, p.title) for p in AppApiParameter.objects.filter(api=api, is_active=True).order_by('name')]
+            apilist.append(jsapifun % (','.join(parmlist), func))
+        applist.append(jsappfun % (app.flag, ''.join(apilist)))
+    apijs = file('api.js', 'w')
+    apijs.write(jsfile_template % ''.join(applist))
+    apijs.close()
+
+
+
+
 def formate_parameter(**kwargs):
     return kwargs
+
+
+jsfile_template = """service_app
+    .factory("api", function (httpReq) {
+        var apis = {
+            %s
+        };
+
+        function init_api(parents, dic) {
+            var url, p;
+            _(dic).each(function (value, key) {
+                p = parents.slice(0);//数组拷贝
+                p.push(key);
+                if (value === 'func') {
+                    url = "/" + p.join('/');
+                    dic[key] = httpReq.bind(null, url);
+                }
+                else {
+                    init_api(p, value);
+                }
+
+            })
+        }
+
+        init_api([], apis);
+
+        return apis;
+    });
+
+"""

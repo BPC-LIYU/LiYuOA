@@ -416,6 +416,3 @@ def update_info_in_talkgroup(request, talkgroup_id, is_muted, nickname, talkuser
     talkuser.save()
     return get_result(True, u'修改群属性成功')
 
-
-
-# todo:\设置我的群属性(昵称\免扰)

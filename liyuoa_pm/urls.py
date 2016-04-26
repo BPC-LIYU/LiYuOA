@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^org/', include('liyu_organization.urls')),
     url(r'^sys/', include('liyuoa.urls')),
     url(r'^develop/', include('liyuoa.develop.urls')),
+    url(r'^chat/', include('liyuim.urls')),
 ]

@@ -197,7 +197,7 @@ class ModefyMixin(object):
         """
         if getattr(self, '_old', None) is not None:
             del self._old
-            del self._old
+            del self.diff_attr
 
 
 class BaseModel(models.Model, JSONBaseMixin, ModefyMixin):
