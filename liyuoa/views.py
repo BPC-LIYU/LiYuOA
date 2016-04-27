@@ -61,6 +61,10 @@ def check_login(request):
 
 @check_request_parmes(realname=("真实姓名", 'r'), username=("手机号", "r,phone"), password=("密码", "r"),
                       email=("电子邮箱", "email", ''), code=("验证码", "r,int"))
+@check_response_results(date_joined=("加入时间", "datetime"), email=("电子邮件", ""), icon_url=("头像url", ""), id=("", "int"),
+                        impassword=("即时通信密码", ""), imusername=("即时通信用户名", ""), is_active=("是否可用", "int"),
+                        is_staff=("是否管理员", "int"), realname=("真实姓名", ""), sessionid=("sessionid", ""),
+                        username=("用户名", ""))
 def reg_user(request, realname, username, password, email, code):
     """
     注册用户
@@ -251,7 +255,7 @@ def send_sms_code(request, tel):
 @check_request_parmes()
 @check_response_results(date_joined=("加入时间", "datetime"), email=("电子邮件", ""), icon_url=("头像url", ""),
                         id=("用户id", "int"),
-                        imusername=("即时通信用户名", ""), is_active=("是否可用", "int"), is_staff=("是否管理员", "int"),
+                        imusername=("即时通信用户名", ""),impassword=("即时通信密码", ""), is_active=("是否可用", "int"), is_staff=("是否管理员", "int"),
                         realname=("真实姓名", ""),
                         username=("用户名", ""))
 @client_login_required
