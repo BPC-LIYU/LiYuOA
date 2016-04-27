@@ -369,6 +369,18 @@ def save_fun_check_response(api, response_check):
             p.save()
 
 
+def formate_parm_is_required(is_required):
+    """
+    返回字符串,参数是否必填
+    :param is_required:
+    :return:
+    """
+    if is_required:
+        return "必填"
+    else:
+        return "非必填"
+
+
 def formate_js_api():
     """
     生成js api 接口调用代码
@@ -384,6 +396,7 @@ def formate_js_api():
     """
     jsapifun = """
                 // %s
+                // %s
                 '%s': 'func',
             """
     from liyuoa.models import AppApiParameter, AppInfo
@@ -393,8 +406,8 @@ def formate_js_api():
         for api in AppApi.objects.filter(app=app, is_active=True).order_by('url'):
 
             func = api.url.split("/")[1]
-            parmlist = [' %s:%s' % (p.name, p.title) for p in AppApiParameter.objects.filter(api=api, is_active=True).order_by('name')]
-            apilist.append(jsapifun % (','.join(parmlist), func))
+            parmlist = [' %s:%s:%s' % (p.name, formate_parm_is_required(p.is_required), p.title) for p in AppApiParameter.objects.filter(api=api, is_active=True).order_by('name')]
+            apilist.append(jsapifun % (api.name.strip(), ','.join(parmlist), func))
         applist.append(jsappfun % (app.flag, ''.join(apilist)))
     apijs = file('api.js', 'w')
     apijs.write(jsfile_template % ''.join(applist))
