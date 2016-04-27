@@ -4,7 +4,8 @@
 # file: views_org.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
-from liyu_organization.models import Organization, OrgApply
+from liyu_organization.models import Organization, OrgApply, Person
+from liyu_organization.org_tools import check_org_relation
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
 
@@ -67,7 +68,228 @@ def apply_organization(request, org_id, content):
     return get_result(True, u'已经发出申请,等待组织管理员审核', applyorg)
 
 
+@check_request_parmes(org_id=("组织id", "r,int"), orgapply_id=("申请id", "r,int"))
+@client_login_required
+@check_org_relation
+def agree_organization(request, org_id, orgapply_id, person):
+    """
+    同意加入组织
+    :param orgapply_id:
+    :param person:
+    :param request:
+    :param org_id:
+    :return:
+    同意加入组织
+    by:王健 at:2016-04-27
+    """
+    if person.manage_type not in [1, 2]:
+        return get_result(False, u'只有管理员才能操作用户的申请')
+    try:
+        apporg = OrgApply.objects.get(id=orgapply_id, org_id=org_id)
+        if apporg.status != 0:
+            if apporg.status == 1:
+                return get_result(False, u'该申请已经被 %s 通过' % apporg.checker)
+            elif apporg.status == 2:
+                return get_result(False, u'该申请已经被 %s 拒绝' % apporg.checker)
+            else:
+                return get_result(False, u'该申请已经被 %s 处理' % apporg.checker)
 
-# todo:/同意加入组织/拒绝加入组织/把用户加入组织/把用户移出组织/添加管理员/删除管理员/转让组织/
-# todo:/创建分组/修改分组信息(名称\隶属\主管\助手)/删除分组/分组加人/分组删人/修改成员信息(昵称\职务)/
-# todo:/获取组织中的应用/添加组织中的应用/删除组织中的应用/设置应用和用户的权限/查询用户和应用的权限/
+        apporg.copy_old()
+        apporg.status = 1
+        apporg.compare_old()
+        apporg.save()
+        member, created = Person.objects.get_or_create(user_id=apporg.user_id, org_id=org_id)
+        member.copy_old()
+        member.realname = apporg.user.realname
+        member.email = apporg.user.email
+        member.is_active = True
+        member.manage_type = 0
+        create, diff = member.compare_old()
+        if diff:
+            member.save()
+        return get_result(True, u'已同意用户的加入组织申请', apporg)
+    except OrgApply.DoesNotExist:
+        return get_result(False, u'这不是发给您的组织的申请,您不能处理')
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), orgapply_id=("申请id", "r,int"))
+@client_login_required
+@check_org_relation
+def reject_organization(request, org_id, orgapply_id, person):
+    """
+    拒绝加入组织
+    :param orgapply_id:
+    :param person:
+    :param request:
+    :param org_id:
+    :return:
+    拒绝加入组织
+    by:王健 at:2016-04-27
+    """
+    if person.manage_type not in [1, 2]:
+        return get_result(False, u'只有管理员才能操作用户的申请')
+    try:
+        apporg = OrgApply.objects.get(id=orgapply_id, org_id=org_id)
+        if apporg.status != 0:
+            if apporg.status == 1:
+                return get_result(False, u'该申请已经被 %s 通过' % apporg.checker)
+            elif apporg.status == 2:
+                return get_result(False, u'该申请已经被 %s 拒绝' % apporg.checker)
+            else:
+                return get_result(False, u'该申请已经被 %s 处理' % apporg.checker)
+
+        apporg.copy_old()
+        apporg.status = 2
+        apporg.compare_old()
+        apporg.save()
+        return get_result(True, u'已经绝用户的加入组织申请', apporg)
+    except OrgApply.DoesNotExist:
+        return get_result(False, u'这不是发给您的组织的申请,您不能处理')
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
+@client_login_required
+@check_org_relation
+def add_person_org(request, org_id, user_id, person):
+    """
+    把用户加入组织,无需申请
+    :param user_id:
+    :param person:
+    :param request:
+    :param org_id:
+    :return:
+    把用户加入组织,无需申请
+    by:王健 at:2016-04-27
+    """
+    if person.manage_type not in [1, 2]:
+        return get_result(False, u'只有管理员才能把用户加入组织')
+    member, created = Person.objects.get_or_create(user_id=user_id, org_id=org_id)
+    member.copy_old()
+    member.realname = member.user.realname
+    member.email = member.user.email
+    member.is_active = True
+    member.manage_type = 0
+    create, diff = member.compare_old()
+    if diff:
+        member.save()
+
+    return get_result(True, u'成功将用户加入组织', member)
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
+@client_login_required
+@check_org_relation
+def remove_person_org(request, org_id, user_id, person):
+    """
+    把用户移出组织
+    :param user_id:
+    :param person:
+    :param request:
+    :param org_id:
+    :return:
+    把用户移出组织
+    by:王健 at:2016-04-27
+    """
+    if person.manage_type not in [1, 2]:
+        return get_result(False, u'只有管理员才能把用户移出组织')
+    try:
+
+        member = Person.objects.get(user_id=user_id, org_id=org_id)
+        member.copy_old()
+        member.is_active = False
+        create, diff = member.compare_old()
+        if diff:
+            member.save()
+        return get_result(True, u'成功将用户移出组织', member)
+    except Person.DoesNotExist:
+        return get_result(False, u'用户不是该组织成员')
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
+@client_login_required
+@check_org_relation
+def add_manager_org(request, org_id, user_id, person):
+    """
+    添加管理员
+    :param user_id:
+    :param person:
+    :param request:
+    :param org_id:
+    :return:
+    添加管理员
+    by:王健 at:2016-04-27
+    """
+    if person.manage_type == 2:
+        return get_result(False, u'只有超级管理员才能添加管理员')
+    try:
+
+        member = Person.objects.get(user_id=user_id, org_id=org_id, is_active=True)
+        member.copy_old()
+        member.manage_type = 1
+        create, diff = member.compare_old()
+        if diff:
+            member.save()
+        return get_result(True, u'成功将用户设置成管理员', member)
+    except Person.DoesNotExist:
+        return get_result(False, u'用户不是该组织成员')
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
+@client_login_required
+@check_org_relation
+def remove_manager_org(request, org_id, user_id, person):
+    """
+    移除管理员
+    :param user_id:
+    :param person:
+    :param request:
+    :param org_id:
+    :return:
+    移除管理员
+    by:王健 at:2016-04-27
+    """
+    if person.manage_type == 2:
+        return get_result(False, u'只有超级管理员才能移除管理员')
+    try:
+
+        member = Person.objects.get(user_id=user_id, org_id=org_id, is_active=True)
+        member.copy_old()
+        member.manage_type = 0
+        create, diff = member.compare_old()
+        if diff:
+            member.save()
+        return get_result(True, u'成功将用户设置成管理员', member)
+    except Person.DoesNotExist:
+        return get_result(False, u'用户不是该组织成员')
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
+@client_login_required
+@check_org_relation
+def transfer_manager_org(request, org_id, user_id, person):
+    """
+    添加新的超级管理员
+    :param user_id:
+    :param person:
+    :param request:
+    :param org_id:
+    :return:
+    添加新的超级管理员
+    by:王健 at:2016-04-27
+    """
+    if person.manage_type == 2:
+        return get_result(False, u'只有超级管理员才能添加新的超级管理员')
+    try:
+
+        member = Person.objects.get(user_id=user_id, org_id=org_id, is_active=True)
+        member.copy_old()
+        member.manage_type = 2
+        create, diff = member.compare_old()
+        if diff:
+            member.save()
+
+        return get_result(True, u'成功将用户设置成超级管理员', member)
+    except Person.DoesNotExist:
+        return get_result(False, u'用户不是该组织成员')
+
+
