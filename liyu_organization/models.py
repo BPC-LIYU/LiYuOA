@@ -91,6 +91,7 @@ class OrgApp(BaseModel):
     sort = models.IntegerField(default=0, db_index=True, null=True, verbose_name=u'排序字段')
 
     class Meta:
+        unique_together = (('org', 'app'),)
         list_json = ['org_id', 'app__name', 'id', 'sort', 'app__flag', 'app__typeflag']
         detail_json = ['create_time', 'is_active']
 
@@ -103,7 +104,7 @@ class Permissions(BaseModel):
     org = models.ForeignKey(Organization, verbose_name=u"隶属组织")
     person = models.ForeignKey(Person, verbose_name=u'用户')
     app = models.ForeignKey('liyuoa.AppInfo', verbose_name=u'应用')
-    role = models.ForeignKey('liyuoa.AppRole', verbose_name=u'应用')
+    role = models.ForeignKey('liyuoa.AppRole', null=True, verbose_name=u'应用')
 
     class Meta:
         unique_together = (("org", "person", "app"),)
