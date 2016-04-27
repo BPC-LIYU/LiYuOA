@@ -27,6 +27,7 @@ def main():
                 run_cmd('/web/LiYuOA', 'python manage.py syncdb')
                 run_cmd('/web/LiYuOA', 'python manage.py sync_appinfo_and_role')
                 run_cmd('/web/LiYuOA', 'python manage.py sync_api_document')
+                run_cmd('/web/LiYuOA', '/etc/init.d/apache2 restart')
         finally:
             os.remove(lock_file)
     return 'ok'
