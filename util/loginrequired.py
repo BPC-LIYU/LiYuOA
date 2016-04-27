@@ -285,6 +285,8 @@ def check_response_results(**checks):
                     if len(checks) > 0 and len(errors) == 0:
                         response.is_response_suggest = False
             if errors:
+                if settings.DEBUG:
+                    print '%s:%s' % (url, ','.join(errors))
                 return get_result(False, '%s:%s' % (url, ','.join(errors)), None)
             return response
 
