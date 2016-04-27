@@ -255,7 +255,7 @@ def send_sms_code(request, tel):
 @check_request_parmes()
 @check_response_results(date_joined=("加入时间", "datetime"), email=("电子邮件", ""), icon_url=("头像url", ""),
                         id=("用户id", "int"),
-                        imusername=("即时通信用户名", ""), is_active=("是否可用", "int"), is_staff=("是否管理员", "int"),
+                        imusername=("即时通信用户名", ""),impassword=("即时通信密码", ""), is_active=("是否可用", "int"), is_staff=("是否管理员", "int"),
                         realname=("真实姓名", ""),
                         username=("用户名", ""))
 @client_login_required
