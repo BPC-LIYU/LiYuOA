@@ -8,3 +8,4 @@ db.sqlite3-journal
 @test*
 /static_all
 Thumbs.db
+api.js
