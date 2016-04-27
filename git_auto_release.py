@@ -10,36 +10,38 @@ import thread
 
 app = Flask(__name__)
 
-target_ref = 'refs/heads/need_server_2_develop'
-target_path = '/web/ttjd_phonegap_www/'
-target_password = 'slkdjflkk13123ksdfsldk'
-
-
-def run_cmd():
-  cmd = """cd "%s" && git pull && python auto_release.py""" % target_path
-  p = subprocess.Popen(cmd, shell=True)
-  p.wait()
+def run_cmd(target_path, in_cmd):
+    cmd = """cd "%s" && %s>>./log""" % (target_path, in_cmd)
+    p = subprocess.Popen(cmd, shell=True)
+    p.wait()
 
 
 @app.route('/', methods=["GET", "POST"])
 def main():
-  lock_file = 'release.lck'
-  if not os.path.exists(lock_file):
-    try:
-      with open(lock_file, 'w') as file:
-        fcntl.flock(file, fcntl.LOCK_EX)
-        run_cmd()
-    finally:
-      os.remove(lock_file)
-  return 'ok'
+    lock_file = 'release.lck'
+    if not os.path.exists(lock_file):
+        try:
+            with open(lock_file, 'w') as file:
+                fcntl.flock(file, fcntl.LOCK_EX)
+                run_cmd('/web/LiYuOA', 'git pull')
+                run_cmd('/web/LiYuOA', 'python manage.py syncdb')
+                run_cmd('/web/LiYuOA', 'python manage.py sync_appinfo_and_role')
+                run_cmd('/web/LiYuOA', 'python manage.py sync_api_document')
+        finally:
+            os.remove(lock_file)
+    return 'ok'
 
 
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
-if __name__ =="__main__":
-  lock_file = 'release.lck'
-  if not os.path.exists(lock_file):
-    with open(lock_file, 'w') as file:
-      fcntl.flock(file, fcntl.LOCK_EX)
-      run_cmd()
-    os.remove(lock_file)
+#
+# if __name__ == "__main__":
+#     lock_file = 'release.lck'
+#     if not os.path.exists(lock_file):
+#         with open(lock_file, 'w') as file:
+#             fcntl.flock(file, fcntl.LOCK_EX)
+#             run_cmd('/web/LiYuOA', 'git pull')
+#             run_cmd('/web/LiYuOA', 'python manage.py syncdb')
+#             run_cmd('/web/LiYuOA', 'python manage.py sync_appinfo_and_role')
+#             run_cmd('/web/LiYuOA', 'python manage.py sync_api_document')
+#         os.remove(lock_file)
