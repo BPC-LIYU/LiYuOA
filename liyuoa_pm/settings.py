@@ -45,7 +45,8 @@ elif 'mac_dev' in os.environ:
     ENVIRONMENT = 'develop'
 elif 'win_dev' in os.environ:
     ENVIRONMENT = 'develop'
-
+elif 'fjw_dev' in os.environ:
+    ENVIRONMENT = 'fjw_dev'
 # Application definition
 
 INSTALLED_APPS = (
