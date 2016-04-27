@@ -51,7 +51,7 @@ class Group(BaseModel):
     org = models.ForeignKey(Organization, verbose_name=u"隶属组织")
     name = models.CharField(max_length=30, verbose_name=u'分组名称')
     icon_url = models.URLField(verbose_name=u'图标url', null=True)
-    members = models.ForeignKey(Person, verbose_name=u'分组成员')
+    members = models.ManyToManyField(Person, verbose_name=u'分组成员')
     charge = models.ForeignKey(Person, related_name='group_charge', verbose_name=u'负责人', null=True)
     aide = models.ForeignKey(Person, related_name='group_aide', verbose_name=u'助手', null=True)
     sort = models.IntegerField(default=0, db_index=True, null=True, verbose_name=u'排序字段')

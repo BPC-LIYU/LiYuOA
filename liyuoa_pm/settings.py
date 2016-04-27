@@ -41,6 +41,10 @@ ALLOWED_HOSTS = ['*']
 ENVIRONMENT = 'aliyun'
 if 'SERVER_SOFTWARE' in os.environ:
     ENVIRONMENT = 'baidu'
+elif 'mac_dev' in os.environ:
+    ENVIRONMENT = 'develop'
+elif 'win_dev' in os.environ:
+    ENVIRONMENT = 'develop'
 
 # Application definition
 
