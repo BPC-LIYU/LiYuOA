@@ -5,7 +5,7 @@
 # Email: wangjian2254@icloud.com
 # Author: 王健
 from liyu_organization.models import Group, Person
-from liyu_organization.org_tools import check_org_relation, check_group
+from liyu_organization.org_tools import check_org_relation, check_group, get_organization_groups
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
 
@@ -56,7 +56,7 @@ def query_group_by_group_list(request, org_id, group_id, page_index, page_size, 
     return get_result(True, None, query.get_page(page_index, page_size))
 
 
-@check_request_parmes(page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
+@check_request_parmes(page_index=("页码", "int", 1), page_size=("页长度", "int", 200))
 @client_login_required
 def query_group_by_my_list(request, page_index, page_size):
     """
@@ -365,7 +365,8 @@ def remove_person_group(request, org_id, user_id, person, group):
                       is_show_email=("是否显示邮箱", "b", True))
 @client_login_required
 @check_org_relation
-def update_person_group(request, org_id, user_id, realname, title, email, is_gaoguan, is_show_tel, is_show_email, person):
+def update_person_group(request, org_id, user_id, realname, title, email, is_gaoguan, is_show_tel, is_show_email,
+                        person):
     """
     修改组织成员信息
     :param group:
@@ -377,7 +378,7 @@ def update_person_group(request, org_id, user_id, realname, title, email, is_gao
     分组加人
     by:王健 at:2016-04-27
     """
-    if person.manage_type in [1,2]:
+    if person.manage_type in [1, 2]:
         try:
             member = Person.objects.get(org_id=org_id, user_id=user_id, is_active=True)
             member.copy_old()
@@ -393,12 +394,13 @@ def update_person_group(request, org_id, user_id, realname, title, email, is_gao
             return get_result(True, u'成员信息修改成功', member)
         except Person.DoesNotExist:
             return get_result(False, u'成员不存在')
-            
+
     else:
         return get_result(False, u'只有管理员可以设置成员信息')
 
 
-@check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
+@check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), page_index=("页码", "int", 1),
+                      page_size=("页长度", "int", 20))
 @client_login_required
 @check_org_relation
 @check_group
@@ -417,3 +419,20 @@ def query_member_by_group_list(request, org_id, group_id, page_index, page_size,
 
     return get_result(True, None, query.get_page(page_index, page_size))
 
+
+@check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "int"))
+@client_login_required
+@check_org_relation
+def get_org_or_group_contacts(request, org_id, group_id, person):
+    """
+    查询组织中的未分组成员
+    :param group_id:
+    :param person:
+    :param org_id:
+    :param request:
+    :return:
+    查询组织中的未分组成员
+    by:王健 at:2016-04-27
+    """
+
+    return get_result(True, None, get_organization_groups(org_id, group_id))

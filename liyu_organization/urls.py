@@ -38,6 +38,7 @@ urlpatterns = patterns('liyu_organization',
                        url('^remove_person_group$', 'views_group.remove_person_group'),
                        url('^update_person_group$', 'views_group.update_person_group'),
                        url('^query_member_by_group_list$', 'views_group.query_member_by_group_list'),
+                       url('^get_org_or_group_contacts$', 'views_group.get_org_or_group_contacts'),
 
                        url('^query_appinfo_by_org_list$', 'views_appinfo.query_appinfo_by_org_list'),
                        url('^query_not_used_appinfo_by_org_list$', 'views_appinfo.query_not_used_appinfo_by_org_list'),
