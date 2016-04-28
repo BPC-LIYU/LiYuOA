@@ -28,6 +28,9 @@ def main():
                 run_cmd('/web/LiYuOA', 'python manage.py sync_appinfo_and_role')
                 run_cmd('/web/LiYuOA', 'python manage.py sync_api_document')
                 run_cmd('/web/LiYuOA', '/etc/init.d/apache2 restart')
+                run_cmd('/web/mqtt-server', 'git pull')
+                run_cmd('/web/mqtt-server', 'supervisorctl restart mqtt')
+
         finally:
             os.remove(lock_file)
     return 'ok'
