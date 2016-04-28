@@ -42,7 +42,7 @@ CACHES = {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': 'redis.duapp.com:80',
         'OPTIONS': {
-            'DB': 1,
+            'DB': 0,
             'PASSWORD': '3885ef8a96a73e17dbfa0e766de2ce08-B5cb0046c2f2d9578597861c7c6e6b6c-urjKdPSgzQrZKYyNSEDk',
             'MAX_ENTRIES': 20000
         },
