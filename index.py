@@ -60,7 +60,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'init.lock'),
     # 自动执行syncdb
     # by: 范俊伟 at:2015-07-15
     try:
-        execute_from_command_line(['manage.py', 'sync_appinfo_and_role', '--noinput'])
+        execute_from_command_line(['manage.py', 'sync_appinfo_and_role'])
         out_init_log('sync_appinfo_and_role complete')
     except Exception, e:
         out_init_log(traceback.format_exc())
@@ -68,7 +68,7 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'init.lock'),
     # 自动执行syncdb
     # by: 范俊伟 at:2015-07-15
     try:
-        execute_from_command_line(['manage.py', 'sync_api_document', '--noinput'])
+        execute_from_command_line(['manage.py', 'sync_api_document'])
         out_init_log('sync_api_document complete')
     except Exception, e:
         out_init_log(traceback.format_exc())
