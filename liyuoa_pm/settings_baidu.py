@@ -32,7 +32,7 @@ SESSION_ENGINE = 'redis_sessions.session'
 
 SESSION_REDIS_HOST = 'redis.duapp.com'
 SESSION_REDIS_PORT = 80
-# SESSION_REDIS_DB = ''
+SESSION_REDIS_DB = 0
 SESSION_REDIS_PASSWORD = "3885ef8a96a73e17dbfa0e766de2ce08-B5cb0046c2f2d9578597861c7c6e6b6c-urjKdPSgzQrZKYyNSEDk"
 SESSION_REDIS_PREFIX = 'liyuoa_session'
 
@@ -42,9 +42,8 @@ CACHES = {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': 'redis.duapp.com',
         'OPTIONS': {
-            'DB': 'urjKdPSgzQrZKYyNSEDk',
-            'username': '3885ef8a96a73e17dbfa0e766de2ce08',
-            'password': 'B5cb0046c2f2d9578597861c7c6e6b6c',
+            'DB': 0,
+            'password': '3885ef8a96a73e17dbfa0e766de2ce08-B5cb0046c2f2d9578597861c7c6e6b6c-urjKdPSgzQrZKYyNSEDk',
             'MAX_ENTRIES': 20000
         },
     },
