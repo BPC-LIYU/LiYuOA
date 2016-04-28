@@ -22,6 +22,7 @@ urlpatterns = patterns('liyu_organization',
                        url('^transfer_manager_org$', 'views_org.transfer_manager_org'),
                        url('^update_organization$', 'views_org.update_organization'),
                        url('^create_organization$', 'views_org.create_organization'),
+                       url('^qrcode_join_org_string$', 'views_qrcode.qrcode_join_org_string'),
 
                        url('^query_group_by_org_list$', 'views_group.query_group_by_org_list'),
                        url('^query_group_by_group_list$', 'views_group.query_group_by_group_list'),

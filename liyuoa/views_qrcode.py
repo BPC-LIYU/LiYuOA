@@ -6,6 +6,7 @@
 # Author: 王健
 from urllib import urlencode
 
+from django import http
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.core.cache import cache
@@ -103,48 +104,48 @@ def qrcode_login_string(request):
     text = "http://%s/sys/qrcode2?%s" % (getHost(), urlencode(parms))
     return get_result(True, '', {"text": text})
 
-#
-# @check_request_parmes(p=("扫码值", 'r'))
-# def qrcode_view2(request, p):
-#     """
-#     二维码处理函数 v2
-#     p 以|分割的函数
-#     [0]:action
-#     action:0 website [1]org_id
-#     action:1 user [1]user_id
-#     action:2 join_org [1]org_id
-#     action:3 desktop_login [1]code
-#     :param p:
-#     :param request:
-#     :return:
-#     """
-#     args = p.split('|')
-#     action = args[0]
-#
-#     if action == "0":
-#         if len(args) != 2:
-#             return http.HttpResponse('len error')
-#         project_id = args[1]
-#         url = 'http://%s/ph/?project_id=%s' % (getHost(), project_id)
-#         return http.HttpResponseRedirect(url)
-#     elif action == "1":
-#         if len(args) != 2:
-#             return http.HttpResponse('len error')
-#         user_id = args[1]
-#         url = 'http://%s/ph/user_info?user_id=%s' % (getHost(), user_id)
-#         return http.HttpResponseRedirect(url)
-#     elif action == "2":
-#         if len(args) != 2:
-#             return http.HttpResponse('len error')
-#         project_id = args[1]
-#         url = 'http://%s/ph/?join=1&project_id=%s' % (getHost(), project_id)
-#         return http.HttpResponseRedirect(url)
-#     elif action == "3":
-#         if len(args) != 2:
-#             return http.HttpResponse('len error')
-#         code = args[1]
-#         url = 'http://www.ddbuild.cn'
-#         return http.HttpResponseRedirect(url)
-#     else:
-#         str = "未知action:%s" % action
-#     return http.HttpResponse(str)
+
+@check_request_parmes(p=("扫码值", 'r'))
+def qrcode_view2(request, p):
+    """
+    二维码处理函数 v2
+    p 以|分割的函数
+    [0]:action
+    action:0 website [1]org_id
+    action:1 user [1]user_id
+    action:2 join_org [1]org_id
+    action:3 desktop_login [1]code
+    :param p:
+    :param request:
+    :return:
+    """
+    args = p.split('|')
+    action = args[0]
+
+    if action == "0":
+        if len(args) != 2:
+            return http.HttpResponse('len error')
+        project_id = args[1]
+        url = 'http://%s/ph/?project_id=%s' % (getHost(), project_id)
+        return http.HttpResponseRedirect(url)
+    elif action == "1":
+        if len(args) != 2:
+            return http.HttpResponse('len error')
+        user_id = args[1]
+        url = 'http://%s/ph/user_info?user_id=%s' % (getHost(), user_id)
+        return http.HttpResponseRedirect(url)
+    elif action == "2":
+        if len(args) != 2:
+            return http.HttpResponse('len error')
+        project_id = args[1]
+        url = 'http://%s/org/get_org_info?join=1&org_id=%s' % (getHost(), project_id)
+        return http.HttpResponseRedirect(url)
+    elif action == "3":
+        if len(args) != 2:
+            return http.HttpResponse('len error')
+        code = args[1]
+        url = 'http://www.ddbuild.cn'
+        return http.HttpResponseRedirect(url)
+    else:
+        str = "未知action:%s" % action
+    return http.HttpResponse(str)
