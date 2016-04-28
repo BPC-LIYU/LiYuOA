@@ -47,6 +47,60 @@ def get_organization(request, org_id):
         return get_result(False, u'组织不存在')
 
 
+@check_request_parmes(name=("组织名称", "r"), icon_url=("组织头像", "url"))
+@client_login_required
+def create_organization(request, name, icon_url):
+    """
+    创建组织
+    :param icon_url:
+    :param name:
+    :param request:
+    :return:
+    创建组织
+    by:王健 at:2016-04-26
+    """
+    try:
+        obj = Organization()
+        obj.name = name
+        obj.icon_url = icon_url
+        obj.save()
+        person = Person()
+        person.org = obj
+        person.manage_type = 2
+        person.user = request.user
+        person.realname = request.user.realname
+        person.email = request.user.email
+        person.save()
+        return get_result(True, None, obj)
+    except Organization.DoesNotExist:
+        return get_result(False, u'组织不存在')
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), name=("组织名称", "r"), icon_url=("组织头像", "url"))
+@client_login_required
+def update_organization(request, org_id, name, icon_url):
+    """
+    查询组织信息信息
+    :param org_id:
+    :param request:
+    :return:
+    查询组织信息信息
+    by:王健 at:2016-04-26
+    """
+    try:
+        obj = Organization.objects.get(pk=org_id)
+        obj.copy_old()
+        obj.name = name
+        if icon_url:
+            obj.icon_url = icon_url
+        created, diff = obj.compare_old()
+        if diff:
+            obj.save()
+        return get_result(True, None, obj)
+    except Organization.DoesNotExist:
+        return get_result(False, u'组织不存在')
+
+
 @check_request_parmes(org_id=("组织id", "r,int"), content=("申请内容", "r"))
 @client_login_required
 def apply_organization(request, org_id, content):

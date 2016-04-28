@@ -162,16 +162,17 @@ USER_ICON_BG_COLORS = [
 
 # 七牛ak sk
 # by:王健 at:2016-04-20
-QN_AK = ''
+QN_AK = 'EMW7OMfjXCB1F-oslGaLzu_dY4OTx6PuiIlQ1Q_V'
 
-QN_SK = ''
+QN_SK = 'TfRaB1Qafnj6BqUb1ioDe-_PqP5LmDhJmVYHJIci'
 
 QN_BUCKET_CONFIG = {
-
+    "liyuoa-pub": {"domain": "http://7xtgsx.com1.z0.glb.clouddn.com/", "is_private": False},
+    "liyuoa-pri": {"domain": "http://7xtgsy.com1.z0.glb.clouddn.com/", "is_private": True},
 }
 
-QN_PUBLIC_BUCKET = ''
-QN_PRIVATE_BUCKET = ''
+QN_PUBLIC_BUCKET = 'liyuoa-pub'
+QN_PRIVATE_BUCKET = 'liyuoa-pri'
 
 HOST_URL = '0.0.0.0:8001'
 

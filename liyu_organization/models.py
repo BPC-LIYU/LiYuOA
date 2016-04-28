@@ -28,7 +28,7 @@ class Person(BaseModel):
     org = models.ForeignKey(Organization, verbose_name=u"隶属组织")
     realname = models.CharField(max_length=8, verbose_name=u'真实姓名')
     email = models.EmailField(null=True, verbose_name=u'电子邮件')
-    title = models.CharField(max_length=10, verbose_name=u'职务')
+    title = models.CharField(max_length=10, blank=True, verbose_name=u'职务')
     manage_type = models.IntegerField(db_index=True, default=0, verbose_name=u'身份类型',
                                       help_text=u"0:普通用户;1普通管理员2:超级管理员;")
     is_gaoguan = models.BooleanField(default=False, verbose_name=u'高管模式')
