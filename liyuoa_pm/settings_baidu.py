@@ -40,11 +40,10 @@ CACHES = {
     'default': {
         # 'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'redis.duapp.com',
+        'LOCATION': 'redis.duapp.com:80',
         'OPTIONS': {
-            'DB': 0,
-            'port': 80,
-            'password': '3885ef8a96a73e17dbfa0e766de2ce08-B5cb0046c2f2d9578597861c7c6e6b6c-urjKdPSgzQrZKYyNSEDk',
+            'DB': 1,
+            'PASSWORD': '3885ef8a96a73e17dbfa0e766de2ce08-B5cb0046c2f2d9578597861c7c6e6b6c-urjKdPSgzQrZKYyNSEDk',
             'MAX_ENTRIES': 20000
         },
     },
