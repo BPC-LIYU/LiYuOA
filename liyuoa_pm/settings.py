@@ -39,7 +39,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 ENVIRONMENT = 'aliyun'
-if 'mac_dev' in os.environ:
+if 'SERVER_SOFTWARE' in os.environ:
+    ENVIRONMENT = 'baidu'
+elif 'mac_dev' in os.environ:
     ENVIRONMENT = 'develop'
 elif 'win_dev' in os.environ:
     ENVIRONMENT = 'develop'
