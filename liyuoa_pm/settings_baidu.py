@@ -43,8 +43,8 @@ CACHES = {
         'LOCATION': 'redis.duapp.com',
         'OPTIONS': {
             'DB': 'urjKdPSgzQrZKYyNSEDk',
-            'username': '3f7bcb13f85445fc',
-            'password': 'needserver2Cache',
+            'username': '3885ef8a96a73e17dbfa0e766de2ce08',
+            'password': 'B5cb0046c2f2d9578597861c7c6e6b6c',
             'MAX_ENTRIES': 20000
         },
     },
