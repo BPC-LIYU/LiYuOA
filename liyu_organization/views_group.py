@@ -107,9 +107,10 @@ def create_group(request, org_id, group_id, charge_id, aide_id, name, person):
     newgroup.org_id = org_id
     newgroup.name = name
     newgroup.parent = group
-    if group is not None and (group.charge.user_id == request.user_id or group.aide.user_id == request.user_id):
-        newgroup.charge_id = group.charge_id
-        newgroup.aide_id = group.aide_id
+    if group is not None and (group.charge_id is not None or group.aide_id is not None):
+        if (group.charge_id is not None and group.charge.user_id == request.user_id) or (group.aide_id is not None and group.aide.user_id == request.user_id):
+            newgroup.charge_id = group.charge_id
+            newgroup.aide_id = group.aide_id
 
     if charge_id:
         newgroup.charge_id = charge_id

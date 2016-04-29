@@ -114,13 +114,13 @@ def get_organization_groups(org_id, group_id=None):
         for person in Person.objects.list_json().filter(org_id=org_id, is_active=True):
             member_dict[person['user_id']] = person
         for group in Group.objects.filter(org_id=org_id, is_active=True).prefetch_related('members'):
-            group_dict[group['id']] = group.toJSON()
-            group_dict[group['id']]['member_ids'] = []
-            group_dict[group['id']]['grouplist'] = []
+            group_dict[group.id] = group.toJSON()
+            group_dict[group.id]['member_ids'] = []
+            group_dict[group.id]['grouplist'] = []
             if group.parent_id is None:
                 group_list.append(group.id)
             for p in group.members.filter(is_active=True).values('user_id'):
-                group_dict[group['id']]['member_ids'].append(p['user_id'])
+                group_dict[group.id]['member_ids'].append(p['user_id'])
                 group_member_ids.add(p['user_id'])
 
         weifenzu.extend(list(set(member_dict.keys()) - group_member_ids))
