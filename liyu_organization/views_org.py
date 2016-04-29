@@ -4,8 +4,8 @@
 # file: views_org.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
-from liyu_organization.models import Organization, OrgApply, Person
-from liyu_organization.org_tools import check_org_relation
+from liyu_organization.models import Organization, OrgApply, Person, OrgHeadIcon
+from liyu_organization.org_tools import check_org_relation, check_org_manager_relation
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
 
@@ -124,7 +124,7 @@ def apply_organization(request, org_id, content):
 
 @check_request_parmes(org_id=("组织id", "r,int"), orgapply_id=("申请id", "r,int"))
 @client_login_required
-@check_org_relation
+@check_org_manager_relation
 def agree_organization(request, org_id, orgapply_id, person):
     """
     同意加入组织
@@ -136,8 +136,6 @@ def agree_organization(request, org_id, orgapply_id, person):
     同意加入组织
     by:王健 at:2016-04-27
     """
-    if person.manage_type not in [1, 2]:
-        return get_result(False, u'只有管理员才能操作用户的申请')
     try:
         apporg = OrgApply.objects.get(id=orgapply_id, org_id=org_id)
         if apporg.status != 0:
@@ -168,7 +166,7 @@ def agree_organization(request, org_id, orgapply_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), orgapply_id=("申请id", "r,int"))
 @client_login_required
-@check_org_relation
+@check_org_manager_relation
 def reject_organization(request, org_id, orgapply_id, person):
     """
     拒绝加入组织
@@ -180,8 +178,6 @@ def reject_organization(request, org_id, orgapply_id, person):
     拒绝加入组织
     by:王健 at:2016-04-27
     """
-    if person.manage_type not in [1, 2]:
-        return get_result(False, u'只有管理员才能操作用户的申请')
     try:
         apporg = OrgApply.objects.get(id=orgapply_id, org_id=org_id)
         if apporg.status != 0:
@@ -203,7 +199,7 @@ def reject_organization(request, org_id, orgapply_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
+@check_org_manager_relation
 def add_person_org(request, org_id, user_id, person):
     """
     把用户加入组织,无需申请
@@ -215,8 +211,6 @@ def add_person_org(request, org_id, user_id, person):
     把用户加入组织,无需申请
     by:王健 at:2016-04-27
     """
-    if person.manage_type not in [1, 2]:
-        return get_result(False, u'只有管理员才能把用户加入组织')
     member, created = Person.objects.get_or_create(user_id=user_id, org_id=org_id)
     member.copy_old()
     member.realname = member.user.realname
@@ -232,7 +226,7 @@ def add_person_org(request, org_id, user_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
+@check_org_manager_relation
 def remove_person_org(request, org_id, user_id, person):
     """
     把用户移出组织
@@ -244,8 +238,6 @@ def remove_person_org(request, org_id, user_id, person):
     把用户移出组织
     by:王健 at:2016-04-27
     """
-    if person.manage_type not in [1, 2]:
-        return get_result(False, u'只有管理员才能把用户移出组织')
     try:
 
         member = Person.objects.get(user_id=user_id, org_id=org_id)
@@ -347,3 +339,24 @@ def transfer_manager_org(request, org_id, user_id, person):
         return get_result(False, u'用户不是该组织成员')
 
 
+@check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
+@client_login_required
+@check_org_manager_relation
+def create_org_headicon(request, org_id, nsfile_id, person):
+    """
+    上传组织头像
+    :param person:
+    :param request:
+    :param org_id:
+    :param nsfile_id:
+    :return:
+    """
+    orghead = OrgHeadIcon()
+    orghead.org_id = org_id
+    orghead.person = person
+    orghead.nsfile_id = nsfile_id
+    orghead.save()
+    orghead.org.icon_url = orghead.nsfile.get_thumbnail(orghead.nsfile.fileurl, orghead.nsfile.bucket,
+                                                        orghead.nsfile.name, orghead.nsfile.filetype)
+    orghead.org.save()
+    return get_result(True, u'上传组织头像成功', orghead.org)

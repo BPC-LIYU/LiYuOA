@@ -23,6 +23,7 @@ urlpatterns = patterns('liyu_organization',
                        url('^update_organization$', 'views_org.update_organization'),
                        url('^create_organization$', 'views_org.create_organization'),
                        url('^qrcode_join_org_string$', 'views_qrcode.qrcode_join_org_string'),
+                       url('^create_org_headicon$', 'views_org.create_org_headicon'),
 
                        url('^query_group_by_org_list$', 'views_group.query_group_by_org_list'),
                        url('^query_group_by_group_list$', 'views_group.query_group_by_group_list'),
