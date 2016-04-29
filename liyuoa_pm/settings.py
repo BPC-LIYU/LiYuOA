@@ -46,13 +46,16 @@ elif 'win_dev' in os.environ:
 elif 'fjw_dev' in os.environ:
     ENVIRONMENT = 'fjw_dev'
 # Application definition
-
+RAVEN_CONFIG = {
+    'dsn': 'http://db572c2eff6f457f9f55b58672b1afab:bb7c2ce5a1234a218a964cab17ab1c1d@sentry.tjeasyshare.com/14',
+}
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'raven.contrib.django.raven_compat',
     'liyuoa',
     'liyu_organization',
     'clouddisk',
@@ -75,7 +78,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.gzip.GZipMiddleware',
-    'util.error_middle.ExceptionMiddleware',
 )
 
 ROOT_URLCONF = 'liyuoa_pm.urls'
