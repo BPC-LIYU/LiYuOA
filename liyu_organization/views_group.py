@@ -447,4 +447,4 @@ def get_org_or_group_contacts(request, org_id, group_id, person):
     """
     group = get_organization_groups(org_id, group_id)
     group['my_person'] = person
-    return get_result(True, None, )
+    return get_result(True, None, group)
