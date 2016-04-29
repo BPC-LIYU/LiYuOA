@@ -429,12 +429,10 @@ def query_member_by_group_list(request, org_id, group_id, page_index, page_size,
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "int"))
 @client_login_required
-@check_org_relation
-def get_org_or_group_contacts(request, org_id, group_id, person):
+def get_org_or_group_contacts(request, org_id, group_id):
     """
     查询组织中的未分组成员
     :param group_id:
-    :param person:
     :param org_id:
     :param request:
     :return:
