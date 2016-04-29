@@ -123,7 +123,7 @@ def get_organization_groups(org_id, group_id=None):
                 group_dict[group['id']]['member_ids'].append(p['user_id'])
                 group_member_ids.add(p['user_id'])
 
-        weifenzu.extend(list(member_dict.keys() - group_member_ids))
+        weifenzu.extend(list(set(member_dict.keys()) - group_member_ids))
         for gid, group in group_dict.items():
             if group['parent_id']:
                 group_dict[group['parent_id']]['grouplist'].append(gid)
