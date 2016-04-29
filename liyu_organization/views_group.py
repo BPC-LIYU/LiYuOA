@@ -5,7 +5,8 @@
 # Email: wangjian2254@icloud.com
 # Author: 王健
 from liyu_organization.models import Group, Person
-from liyu_organization.org_tools import check_org_relation, check_group, get_organization_groups
+from liyu_organization.org_tools import check_org_relation, check_group, get_organization_groups, \
+    clean_organization_groups_cache
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
 
@@ -332,6 +333,7 @@ def add_person_group(request, org_id, user_id, person, group):
             group.members.add(Person.objects.get(org_id=org_id, user_id=user_id, is_active=True))
         except Person.DoesNotExist:
             return get_result(False, u'用户不是当前组织的成员,不能加入分组')
+        clean_organization_groups_cache(org_id)
         return get_result(True, u'分组加人成功')
     else:
         return get_result(False, u'只有管理员、分组主管、分组主管助手、父级分组主管、父级分组主管助手可以添加分组成员')
@@ -362,6 +364,8 @@ def remove_person_group(request, org_id, user_id, person, group):
             group.members.remove(Person.objects.get(org_id=org_id, user_id=user_id, is_active=True))
         except Person.DoesNotExist:
             pass
+        clean_organization_groups_cache(org_id)
+
         return get_result(True, u'分组成员移出成功')
     else:
         return get_result(False, u'只有管理员、分组主管、分组主管助手、父级分组主管、父级分组主管助手可以移出分组成员')

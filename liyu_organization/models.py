@@ -35,6 +35,11 @@ class Person(BaseModel):
     is_show_tel = models.BooleanField(default=True, verbose_name=u'是否显示手机号')
     is_show_email = models.BooleanField(default=True, verbose_name=u'是否显示电子邮箱')
 
+    def save(self, **kwargs):
+        super(Person, self).save(**kwargs)
+        from org_tools import clean_organization_groups_cache
+        clean_organization_groups_cache(self.org_id)
+
     class Meta:
         list_json = ['realname', 'user__icon_url', 'id', 'user_id', 'org_id', 'title', 'manage_type', 'is_active']
         detail_json = ['user__realname', 'create_time', 'user__imusername', 'is_gaoguan', 'is_show_tel',
@@ -57,6 +62,11 @@ class Group(BaseModel):
     aide = models.ForeignKey(Person, related_name='group_aide', verbose_name=u'助手', null=True)
     sort = models.IntegerField(default=0, db_index=True, null=True, verbose_name=u'排序字段')
     parent = models.ForeignKey('Group', null=True, verbose_name=u'隶属关系')
+
+    def save(self, **kwargs):
+        super(Group, self).save(**kwargs)
+        from org_tools import clean_organization_groups_cache
+        clean_organization_groups_cache(self.org_id)
 
     class Meta:
         list_json = ['name', 'icon_url', 'id', 'org_id', 'is_active', 'sort', 'parent_id']
