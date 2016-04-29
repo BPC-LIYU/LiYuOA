@@ -134,7 +134,7 @@ def reject_friendapply(request, friendapply_id):
 
 @check_request_parmes(friend_id=("好友id", "r,int"), nickname=("昵称", ""))
 @client_login_required
-@check_friend_relation
+@check_friend_relation()
 def modefy_friend_nickname(request, friend_id, nickname, friend):
     """
     修改好友备注名称
@@ -154,7 +154,7 @@ def modefy_friend_nickname(request, friend_id, nickname, friend):
 
 @check_request_parmes(friend_id=("好友id", "r,int"), is_black=("是否黑名单", "r,b"))
 @client_login_required
-@check_friend_relation
+@check_friend_relation()
 def mark_friend_black(request, friend_id, is_black, friend):
     """
     设置好友到黑名单
@@ -175,7 +175,7 @@ def mark_friend_black(request, friend_id, is_black, friend):
 
 @check_request_parmes(friend_id=("好友id", "r,int"), is_muted=("是否免扰", "r,b"))
 @client_login_required
-@check_friend_relation
+@check_friend_relation()
 def mark_friend_muted(request, friend_id, is_muted, friend):
     """
     设置好友免扰

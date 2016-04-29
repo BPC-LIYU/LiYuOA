@@ -82,7 +82,7 @@ def create_talkgroup(request, name, group_type, member_ids):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def get_talkgroup(request, talkgroup_id, talkuser):
     """
     查询群信息信息
@@ -101,7 +101,7 @@ def get_talkgroup(request, talkgroup_id, talkuser):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def query_talkgroup_member_list(request, talkgroup_id, talkuser, page_index, page_size):
     """
     查询群成员列表列表
@@ -120,7 +120,7 @@ def query_talkgroup_member_list(request, talkgroup_id, talkuser, page_index, pag
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def quite_talkgroup(request, talkgroup_id, talkuser):
     """
     退出群
@@ -141,7 +141,7 @@ def quite_talkgroup(request, talkgroup_id, talkuser):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def dismiss_talkgroup(request, talkgroup_id, talkuser):
     """
     解散群
@@ -164,7 +164,7 @@ def dismiss_talkgroup(request, talkgroup_id, talkuser):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def remove_talkgroup(request, talkgroup_id, user_id, talkuser):
     """
     踢人出群
@@ -188,7 +188,7 @@ def remove_talkgroup(request, talkgroup_id, user_id, talkuser):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def add_talkgroup(request, talkgroup_id, user_id, talkuser):
     """
     拉人入群
@@ -290,7 +290,7 @@ def reject_talkapply(request, talkapply_id, reply):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def add_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
     """
     添加管理员
@@ -317,7 +317,7 @@ def add_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def remove_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
     """
     删除管理员
@@ -346,7 +346,7 @@ def remove_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def transfer_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
     """
     转让群
@@ -374,7 +374,7 @@ def transfer_talkgroup_manager(request, talkgroup_id, user_id, talkuser):
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), user_id=("用户id", "r,int"), nickname=("昵称", "r"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def update_nick_in_talkgroup(request, talkgroup_id, user_id, nickname, talkuser):
     """
     修改群成员昵称
@@ -403,7 +403,7 @@ def update_nick_in_talkgroup(request, talkgroup_id, user_id, nickname, talkuser)
 
 @check_request_parmes(talkgroup_id=("群id", "r,int"), nickname=("昵称", "r"), is_muted=("是否免打扰", "b"))
 @client_login_required
-@check_group_relation
+@check_group_relation()
 def update_info_in_talkgroup(request, talkgroup_id, is_muted, nickname, talkuser):
     """
     修改自己的群属性
