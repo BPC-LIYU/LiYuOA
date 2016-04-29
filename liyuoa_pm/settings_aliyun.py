@@ -47,3 +47,7 @@ SESSION_ALIYUN_OPTIONS = {'OPTIONS': {
 # by:尚宗凯 at:2015-3-8
 SESSION_ENGINE = 'aliyun_session.session'
 SESSION_OCS_PREFIX = 'aliyun_session_liyuoa'
+
+
+MQTT_HOST = "0.0.0.0"
+MQTT_PORT = 50051

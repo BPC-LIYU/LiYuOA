@@ -5,7 +5,7 @@
 # Email: wangjian2254@icloud.com
 # Author: 王健
 from liyu_organization.models import Organization, OrgApply, Person, OrgHeadIcon
-from liyu_organization.org_tools import check_org_relation, check_org_manager_relation
+from liyu_organization.org_tools import check_org_relation, check_org_manager_relation, org_commend
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
 
@@ -71,6 +71,9 @@ def create_organization(request, name, icon_url):
         person.realname = request.user.realname
         person.email = request.user.email
         person.save()
+
+        org_commend("create_organization", obj.id, None)
+
         return get_result(True, None, obj)
     except Organization.DoesNotExist:
         return get_result(False, u'组织不存在')
@@ -96,6 +99,7 @@ def update_organization(request, org_id, name, icon_url):
         created, diff = obj.compare_old()
         if diff:
             obj.save()
+            org_commend("update_organization", obj.id, None)
         return get_result(True, None, obj)
     except Organization.DoesNotExist:
         return get_result(False, u'组织不存在')

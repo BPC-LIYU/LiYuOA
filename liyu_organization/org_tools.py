@@ -8,6 +8,7 @@ from django.core.cache import cache
 
 from liyu_organization import ORGANIZATION_GROUPS_AND_MEMBERS
 from liyu_organization.models import Person, Group
+from liyuim.rpc.im_commend import im_commend
 from util.jsonresult import get_result
 
 
@@ -94,10 +95,10 @@ def clean_organization_groups_cache(org_id):
     cache.delete(cache_key)
 
 
-def get_organization_groups(org_id, group_id=None):
+def get_organization_cache(org_id):
     """
-    查询组织结构, 计算各组人员
-    :param group_id:
+    获取组织结构的缓存
+    by:王健 at:2016-04-29
     :param org_id:
     :return:
     """
@@ -129,8 +130,19 @@ def get_organization_groups(org_id, group_id=None):
                 group_dict[group['parent_id']]['grouplist'].append(gid)
 
         cache.set(cache_key, result)
+    return result
 
-    obj = {'members': [], 'groups': [], 'name': None, 'id': None, 'group_link':[]}
+
+def get_organization_groups(org_id, group_id=None):
+    """
+    查询组织结构, 计算各组人员
+    :param group_id:
+    :param org_id:
+    :return:
+    """
+
+    result = get_organization_cache(org_id)
+    obj = {'members': [], 'groups': [], 'name': None, 'id': None, 'group_link': []}
     if group_id is None:
         for uid in result['weifenzu']:
             obj['members'].append(result['person'][uid])
@@ -159,10 +171,22 @@ def get_organization_groups(org_id, group_id=None):
                 tmp_group = result['group'][tmp_group['parent_id']]
             else:
                 tmp_group = None
-            i+=1
-            if i>100:
+            i += 1
+            if i > 100:
                 tmp_group = None
 
     return obj
 
 
+def org_commend(event, org_id, message, user_ids=None):
+    """
+    组织事件:
+    :param event:
+    :param org_id:
+    :param message:
+    :return:
+    """
+    if user_ids is None:
+        result = get_organization_cache(org_id)
+        user_ids = result['person'].keys()
+    im_commend("org", {"event": event, "org_id": org_id, "message": message, "user_ids": user_ids})

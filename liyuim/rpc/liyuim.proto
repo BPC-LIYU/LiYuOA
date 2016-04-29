@@ -1,5 +1,5 @@
 
-syntax = "proto2";
+syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "com.liyu.oa.im";
@@ -9,27 +9,19 @@ option objc_class_prefix = "LY";
 package im;
 
 // The greeting service definition.
-service FriendRelation {
-  // apply friend push client
-  rpc ApplyFriend (FriendApply) returns (IMResult) {}
+service MqttCommend {
 
   // pass apply push client
-  rpc PassApplyFriend (FriendApply) returns (IMResult) {}
+  rpc CommendIm (IMRequest) returns (IMResult) {}
 
 }
 
 // The request message containing the user's name.
-message FriendApply {
-  required int32 apply_id = 1;
-  required int32 friend_id = 2;
-  required int32 owner_id = 3;
-  required int32 status = 4;
-  required string content = 5;
+message IMRequest {
+  string commend = 1;
 }
 
 // The response message containing the greetings
 message IMResult {
-  required bool success = 1;
-  required string message = 2;
-  required int32 status_code = 3;
+  string result = 1;
 }
