@@ -5,8 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 import uuid
-from nsbcs.models import NsFile, NS_FILE_GROUP_TYPE_SYS, NS_FILE_GROUP_TYPE_USER, \
-    NS_FILE_GROUP_TYPE_ORG
+from nsbcs.models import NsFile
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes
 

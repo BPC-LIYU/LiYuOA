@@ -130,7 +130,7 @@ def get_organization_groups(org_id, group_id=None):
 
         cache.set(cache_key, result)
 
-    obj = {'members': [], 'groups': [], 'name': None, 'id': None}
+    obj = {'members': [], 'groups': [], 'name': None, 'id': None, 'group_link':[]}
     if group_id is None:
         for uid in result['weifenzu']:
             obj['members'].append(result['person'][uid])
@@ -147,6 +147,22 @@ def get_organization_groups(org_id, group_id=None):
 
         for gid in group['grouplist']:
             obj['groups'].append(result['group'][gid])
+
+        # 计算出分组父级链
+        link = []
+        obj['group_link'] = link
+        i = 0
+        tmp_group = group
+        while tmp_group is not None:
+            link.append(tmp_group)
+            if tmp_group['parent_id']:
+                tmp_group = result['group'][tmp_group['parent_id']]
+            else:
+                tmp_group = None
+            i+=1
+            if i>100:
+                tmp_group = None
+
     return obj
 
 
