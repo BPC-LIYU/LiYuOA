@@ -75,10 +75,10 @@ def query_group_by_my_list(request, page_index, page_size):
     return get_result(True, None, query.get_page(page_index, page_size))
 
 
-@check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "int"), name=("分组名称", ""))
+@check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "int"), name=("分组名称", ""), charge_id=("主管id", "int"), aide_id=("主管id", "int"))
 @client_login_required
 @check_org_relation
-def create_group(request, org_id, group_id, name, person):
+def create_group(request, org_id, group_id, charge_id, aide_id, name, person):
     """
     创建分组
     :param request:
@@ -86,6 +86,8 @@ def create_group(request, org_id, group_id, name, person):
     :return:
     创建分组
     by:王健 at:2016-04-27
+    创建分组时可以提供主管 和 主管助理的参数
+    by:王健 at:2016-04-29
     """
     group = None
     if group_id is None:
@@ -107,6 +109,11 @@ def create_group(request, org_id, group_id, name, person):
     if group is not None and (group.charge.user_id == request.user_id or group.aide.user_id == request.user_id):
         newgroup.charge_id = group.charge_id
         newgroup.aide_id = group.aide_id
+
+    if charge_id:
+        newgroup.charge_id = charge_id
+    if aide_id:
+        newgroup.aide_id = aide_id
 
     newgroup.save()
 
