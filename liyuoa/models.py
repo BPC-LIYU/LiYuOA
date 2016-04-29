@@ -163,3 +163,21 @@ class AppApiComment(BaseModel):
                      'to_user__icon_url', 'create_time', 'to_comment_id', 'to_comment__content', 'to_comment__user_id',
                      'to_comment__user__icon_url', 'to_comment__user__realname', 'source', 'username']
         detail_json = ['is_active']
+
+
+class UserHeadIcon(BaseModel):
+    """
+    即时通信发送的文件
+    by:王健 at:2016-04-23
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=u'上传者')
+    nsfile = models.ForeignKey('nsbcs.NsFile', verbose_name=u'附件')
+
+    def save(self, **kwargs):
+        super(UserHeadIcon, self).save(**kwargs)
+        self.nsfile.update_file_status()
+
+    class Meta:
+        list_json = ['id', 'user_id', 'nsfile_id', 'nsfile__name', 'nsfile__filetype', 'nsfile__size',
+                     'nsfile__fileurl', 'nsfile__bucket']
+        detail_json = ['create_time', 'is_active']

@@ -16,8 +16,8 @@ urlpatterns = patterns('nsbcs',
                        url(r'^get_upload_files_url$', 'views_bcsfile.get_upload_files_url'),
                         # 检查文件是否在bcs中
                         # by:王健 at:2015-1-26
-                       url(r'^get_file_url_public$', 'views_bcsfile.get_file_url_public'),
-                       url(r'^get_file_url_private$', 'views_bcsfile.get_file_url_private'),
-                       url(r'^upload_complete$', 'views_bcsfile.upload_complete'),
+                       # url(r'^get_file_url_public$', 'views_bcsfile.get_file_url_public'),
+                       # url(r'^get_file_url_private$', 'views_bcsfile.get_file_url_private'),
+                       # url(r'^upload_complete$', 'views_bcsfile.upload_complete'),
 
 )

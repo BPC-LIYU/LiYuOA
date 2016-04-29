@@ -24,33 +24,11 @@ try:
 except:
     pass
 
-NS_FILE_GROUP_TYPE_SYS = 0
-NS_FILE_GROUP_TYPE_USER = 1
-NS_FILE_GROUP_TYPE_ORG = 3
-
-NS_FILE_GROUP_TYPE_CHOICES = [
-    (NS_FILE_GROUP_TYPE_SYS, u'系统图片'),
-    (NS_FILE_GROUP_TYPE_USER, u'用户图片'),
-    (NS_FILE_GROUP_TYPE_ORG, u'组织图片'),
-]
-
 
 class NsFile(BaseModel):
     """
-    附件基础类
-    by:王健 at:2015-1-28
-    添加七牛存储的 bucket
-    by:王健 at:2015-3-24
-    增加img_size字段
-    by: 范俊伟 at:2015-04-09
-    编码中文文件名
-    by: 范俊伟 at:2015-04-13
-    增加文件所属云盘目录字段
-    by:王健 at:2015-10-28
-    is_copy 字段描述文件是否在数据删除是是否删除七牛文件
-    by:王健 at:2015-10-31
-    去除is_copy 字段，七牛上冗余存储
-    by:王健 at:2015-10-31
+    只保存文件基本信息
+    by:王健 at:2016-04-29
     """
 
     name = models.CharField(max_length=50, verbose_name=u'附件名称')
@@ -59,15 +37,15 @@ class NsFile(BaseModel):
     size = models.BigIntegerField(default=0, verbose_name=u'文件大小')
     bucket = models.CharField(blank=True, max_length=20, verbose_name=u'位置')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, verbose_name=u'作者', help_text=u'上传人')
-    org = models.ForeignKey('liyu_organization.Organization', null=True, verbose_name=u'隶属项目', help_text=u'隶属项目')
-    person = models.ForeignKey('liyu_organization.Person', null=True, verbose_name=u'隶属组织成员', help_text=u'隶属项目')
-    cloud_disk = models.ForeignKey('clouddisk.CloudDisk', null=True, verbose_name=u'隶属云盘目录')
-    group_type = models.IntegerField(default=NS_FILE_GROUP_TYPE_SYS, db_index=True, choices=NS_FILE_GROUP_TYPE_CHOICES)
+    # org = models.ForeignKey('liyu_organization.Organization', null=True, verbose_name=u'隶属项目', help_text=u'隶属项目')
+    # person = models.ForeignKey('liyu_organization.Person', null=True, verbose_name=u'隶属组织成员', help_text=u'隶属项目')
+    # cloud_disk = models.ForeignKey('clouddisk.CloudDisk', null=True, verbose_name=u'隶属云盘目录')
+    access_type = models.CharField(default="public", max_length=10, db_index=True)
+    file_status = models.BooleanField(default=False, db_index=True)
 
     class Meta:
-        list_json = ['name', 'fileurl', 'bucket', 'id', 'filetype', 'size', 'cloud_disk_id', 'group_type']
-        detail_json = ['create_time', 'is_active', 'user_id', 'org_id', 'person_id', 'person__realname',
-                       'person__user__icon_url', 'cloud_disk__name']
+        list_json = ['name', 'fileurl', 'bucket', 'id', 'filetype', 'size']
+        detail_json = ['create_time', 'is_active', 'user_id']
 
     @staticmethod
     def get_url(fileurl, bucket, name, fop=None, expires=3600):
@@ -154,7 +132,7 @@ class NsFile(BaseModel):
         ret, info = bucket_manage.delete(bucket, key)
         return r
 
-    def copy(self, user, person, org, bucket):
+    def copy(self, user, bucket):
         """
         七牛复制
         by: 闫宇 at:2015-11-01
@@ -171,8 +149,8 @@ class NsFile(BaseModel):
         newobj.size = self.size
         newobj.bucket = bucket
         newobj.user = user
-        newobj.person = person
-        newobj.org = org
+        # newobj.person = person
+        # newobj.org = org
         bucket_manage = qiniu.BucketManager(qn_auth)
         ret, info = bucket_manage.copy(self.bucket, self.fileurl, newobj.bucket, newobj.fileurl)
         if ret:
@@ -200,7 +178,7 @@ class NsFile(BaseModel):
         by: 范俊伟 at:2015-04-09
         """
         from util.tools import common_except_log
-        if self.is_active and not self.size:
+        if self.file_status and not self.size:
             try:
                 bucket_manage = qiniu.BucketManager(qn_auth)
                 ret, info = bucket_manage.stat(self.bucket, self.fileurl)
@@ -211,24 +189,15 @@ class NsFile(BaseModel):
 
         return super(NsFile, self).save(*args, **kwargs)
 
-    @staticmethod
-    def update_file_status(fileobj, user_id=None, person_id=None, org_id=None):
+    def update_file_status(self):
         """
         更新文件状态
         by:王健 at:2016-04-20
-        :param org_id:
-        :param person_id:
-        :param user_id:
-        :param fileobj:
+        :param self:
         :return:
         """
 
-        fileobj.file_status = True
-        if org_id:
-            fileobj.org_id = org_id
-        if user_id:
-            fileobj.user_id = user_id
-        if person_id:
-            fileobj.person_id = person_id
-        fileobj.save()
+        self.file_status = True
+
+        self.save()
 

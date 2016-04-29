@@ -27,3 +27,22 @@ class CloudDisk(BaseModel):
     class Meta:
         list_json = ['name', 'is_pub', 'id', 'org_id', 'user_id', 'father_id', 'disk_type']
         detail_json = ['user_id', 'create_time', 'is_active']
+
+
+class CloudFile(BaseModel):
+    """
+    云盘文件
+    by:王健 at:2016-04-20
+    """
+    clouddisk = models.ForeignKey(CloudDisk, verbose_name=u'隶属云盘')
+    nsfile = models.ForeignKey('nsbcs.NsFile', verbose_name=u'云文件')
+    person = models.ForeignKey('liyu_organization.Person', null=True, verbose_name=u'隶属组织成员')
+
+    def save(self, **kwargs):
+        super(CloudFile, self).save(**kwargs)
+        self.nsfile.update_file_status()
+
+    class Meta:
+        list_json = ['id', 'person__user_id', 'nsfile_id', 'nsfile__name', 'nsfile__filetype', 'nsfile__size',
+                     'nsfile__fileurl', 'nsfile__bucket', 'clouddisk_id']
+        detail_json = ['create_time', 'is_active']

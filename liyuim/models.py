@@ -94,7 +94,8 @@ class TalkUser(BaseModel):
     is_muted = models.BooleanField(default=False, verbose_name=u'是否静音')
 
     class Meta:
-        list_json = ['id', 'talkgroup_id', 'user__realname', 'user__icon_url', 'nickname', 'role', 'is_muted', 'read_timeline']
+        list_json = ['id', 'talkgroup_id', 'user__realname', 'user__icon_url', 'nickname', 'role', 'is_muted',
+                     'read_timeline']
         detail_json = ['create_time', 'is_active']
 
 
@@ -125,8 +126,8 @@ class TalkApply(BaseModel):
     checker = models.ForeignKey(TalkUser, null=True, verbose_name=u'处理人')
 
     class Meta:
-        list_json = ['id', 'talkgroup_id', 'talkgroup__icon_url', 'talkgroup__name', 'status', 'content', 'reply', 'checker_id',
-                     'checker__nickname', 'checker__user__icon_url']
+        list_json = ['id', 'talkgroup_id', 'talkgroup__icon_url', 'talkgroup__name', 'status', 'content', 'reply',
+                     'checker_id', 'checker__nickname', 'checker__user__icon_url']
         detail_json = ['create_time', 'is_active']
 
 
@@ -135,12 +136,15 @@ class IMFile(BaseModel):
     即时通信发送的文件
     by:王健 at:2016-04-23
     """
-    owner = models.ForeignKey(TalkUser, verbose_name=u'发送者')
-    chat_id = models.IntegerField(db_index=True, verbose_name=u'发送目标')
-    is_group = models.BooleanField(default=False, db_index=True, verbose_name=u'是否发给群')
-    file_type = models.CharField(max_length=10, db_index=True, verbose_name=u'附件类型')
-    file = models.ForeignKey('nsbcs.NsFile', verbose_name=u'附件')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, verbose_name=u'发送者')
+    chat_session = models.CharField(max_length=50, null=True, db_index=True, verbose_name=u'发送群')
+    nsfile = models.ForeignKey('nsbcs.NsFile', verbose_name=u'附件')
+
+    def save(self, **kwargs):
+        super(IMFile, self).save(**kwargs)
+        self.nsfile.update_file_status()
 
     class Meta:
-        list_json = ['id', 'chat_id', 'is_group', 'file_type', 'file_id', 'file__name', 'file__filetype', 'file__size']
+        list_json = ['id', 'user_id', 'nsfile_id', 'nsfile__name', 'nsfile__filetype', 'nsfile__size',
+                     'nsfile__fileurl', 'nsfile__bucket']
         detail_json = ['create_time', 'is_active']

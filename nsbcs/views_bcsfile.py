@@ -13,30 +13,28 @@ from util.loginrequired import check_request_parmes
 __author__ = u'王健'
 
 
-def get_bucket_by_group_type(group_type):
+def get_bucket_by_access_type(group_type):
     """
     根据类型获取存储空间
     by:王健 at:2016-04-20
     :param group_type:
     :return:
     """
-    if group_type == "sys":
+    if group_type == "public":
         return settings.QN_PUBLIC_BUCKET
-    elif group_type == "user":
-        return settings.QN_PUBLIC_BUCKET
-    elif group_type == "org":
-        return settings.QN_PUBLIC_BUCKET
+    elif group_type == "private":
+        return settings.QN_PRIVATE_BUCKET
     return None
 
 
-@check_request_parmes(group_type=("文件存储类型", "r"), filetype=("文件类型", "r"), filename=("文件名称", "r"))
+@check_request_parmes(access_type=("文件访问类型", "r"), filetype=("文件类型", "r"), filename=("文件名称", "r"))
 @transaction.atomic()
-def get_upload_files_url(request, group_type, filetype, filename):
+def get_upload_files_url(request, access_type, filetype, filename):
     """
     获取上传文件的url信息
     :param filetype:
     :param filename:
-    :param group_type:
+    :param access_type:
     :param request:
     :return:
     获取上传地址
@@ -50,24 +48,19 @@ def get_upload_files_url(request, group_type, filetype, filename):
     文件类型处理
     by: 范俊伟 at:2015-08-28
     """
-    bucket = get_bucket_by_group_type(group_type)
+    bucket = get_bucket_by_access_type(access_type)
     if bucket is None:
         return get_result(False, '无效的group_type')
     fileobj = NsFile()
-    if group_type == "sys":
-        fileobj.group_type = NS_FILE_GROUP_TYPE_SYS
-    elif group_type == "user":
-        fileobj.group_type = NS_FILE_GROUP_TYPE_USER
-    elif group_type == "org":
-        fileobj.group_type = NS_FILE_GROUP_TYPE_ORG
+
     if request.user.is_anonymous():
         fileobj.user = request.user
     fileobj.bucket = bucket
-    fileobj.is_active = False
+    fileobj.file_status = False
     fileobj.filetype = filetype
     fileobj.name = filename[-20:]
     uuidname = str(uuid.uuid1())
-    object_name = str('%s/%s.%s' % (group_type, uuidname, fileobj.filetype))
+    object_name = str('%s/%s.%s' % (access_type, uuidname, fileobj.filetype))
     fileobj.fileurl = object_name
     fileobj.save()
     return get_result(True, u'',
@@ -106,7 +99,7 @@ def get_file_url_public(request, fileid, img_w, img_h):
     :param request:
     :return:
     """
-    fileobjs = NsFile.objects.filter(pk__in=fileid).exclude(group_type=NS_FILE_GROUP_TYPE_ORG).list_json()
+    fileobjs = NsFile.objects.filter(pk__in=fileid, access_type="public").list_json()
     formate_file_url(img_w, img_h, fileobjs)
     return get_result(True, u'', fileobjs)
 
@@ -156,5 +149,5 @@ def upload_complete(request, fileid, user_id=None, person_id=None, org_id=None):
     :return:
     """
     for fileobj in NsFile.objects.filter(pk__in=fileid):
-        NsFile.update_file_status(fileobj, user_id, person_id, org_id)
+        NsFile.update_file_status(fileobj, user_id)
     return get_result(True, '')

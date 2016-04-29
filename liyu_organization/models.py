@@ -37,7 +37,8 @@ class Person(BaseModel):
 
     class Meta:
         list_json = ['realname', 'user__icon_url', 'id', 'user_id', 'org_id', 'title', 'manage_type', 'is_active']
-        detail_json = ['user__realname', 'create_time', 'user__imusername', 'is_gaoguan', 'is_show_tel', 'is_show_email']
+        detail_json = ['user__realname', 'create_time', 'user__imusername', 'is_gaoguan', 'is_show_tel',
+                       'is_show_email']
 
     def __unicode__(self):
         return u'$s#%s' % (self.pk, self.realname)
@@ -115,3 +116,23 @@ class Permissions(BaseModel):
 
     def __unicode__(self):
         return u'$s#%s#%s' % (self.pk, self.app.name, self.role.name)
+
+
+class OrgHeadIcon(BaseModel):
+    """
+    组织和部门的头像
+    by:王健 at:2016-04-29
+    """
+    org = models.ForeignKey(Organization, verbose_name=u"隶属组织")
+    group = models.ForeignKey(Group, null=True, verbose_name=u'隶属分组')
+    nsfile = models.ForeignKey('nsbcs.NsFile', verbose_name=u'附件')
+    person = models.ForeignKey(Person, verbose_name=u'上传者')
+
+    def save(self, **kwargs):
+        super(OrgHeadIcon, self).save(**kwargs)
+        self.nsfile.update_file_status()
+
+    class Meta:
+        list_json = ['id', 'org_id', 'group_id', 'person__user_id', 'nsfile_id', 'nsfile__name', 'nsfile__filetype',
+                     'nsfile__size', 'nsfile__fileurl', 'nsfile__bucket']
+        detail_json = ['create_time', 'is_active']
