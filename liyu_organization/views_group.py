@@ -434,7 +434,8 @@ def query_member_by_group_list(request, org_id, group_id, page_index, page_size,
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "int"))
 @client_login_required
-def get_org_or_group_contacts(request, org_id, group_id):
+@check_org_relation()
+def get_org_or_group_contacts(request, org_id, group_id, person):
     """
     查询组织中的未分组成员
     :param group_id:
@@ -444,5 +445,6 @@ def get_org_or_group_contacts(request, org_id, group_id):
     查询组织中的未分组成员
     by:王健 at:2016-04-27
     """
-
-    return get_result(True, None, get_organization_groups(org_id, group_id))
+    group = get_organization_groups(org_id, group_id)
+    group['my_person'] = person
+    return get_result(True, None, )
