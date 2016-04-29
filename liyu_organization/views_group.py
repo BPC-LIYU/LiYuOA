@@ -12,7 +12,7 @@ from util.loginrequired import check_request_parmes, client_login_required
 
 @check_request_parmes(org_id=("组织id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def query_group_by_org_list(request, org_id, page_index, page_size, person):
     """
     查询组织中的分组列表,顶级分组
@@ -35,7 +35,7 @@ def query_group_by_org_list(request, org_id, page_index, page_size, person):
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), page_index=("页码", "int", 1),
                       page_size=("页长度", "int", 20))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def query_group_by_group_list(request, org_id, group_id, page_index, page_size, person):
     """
     查询组织中的分组列表,顶级分组
@@ -77,7 +77,7 @@ def query_group_by_my_list(request, page_index, page_size):
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "int"), name=("分组名称", ""), charge_id=("主管id", "int"), aide_id=("主管id", "int"))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def create_group(request, org_id, group_id, charge_id, aide_id, name, person):
     """
     创建分组
@@ -123,8 +123,8 @@ def create_group(request, org_id, group_id, charge_id, aide_id, name, person):
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), name=("分组名称", ""),
                       icon_url=("头像", "url"), parent_id=("父级分组id", "int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def update_group(request, org_id, group_id, name, icon_url, parent_id, person, group):
     """
     修改分组的信息
@@ -164,8 +164,8 @@ def update_group(request, org_id, group_id, name, icon_url, parent_id, person, g
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def remove_charge_group(request, org_id, person, group):
     """
     删除分组主管
@@ -191,8 +191,8 @@ def remove_charge_group(request, org_id, person, group):
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def remove_aide_group(request, org_id, person, group):
     """
     删除分组主管
@@ -218,8 +218,8 @@ def remove_aide_group(request, org_id, person, group):
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def add_charge_group(request, org_id, group_id, user_id, person, group):
     """
     添加分组主管
@@ -247,8 +247,8 @@ def add_charge_group(request, org_id, group_id, user_id, person, group):
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def add_aide_group(request, org_id, user_id, person, group):
     """
     删除分组主管
@@ -281,8 +281,8 @@ def add_aide_group(request, org_id, user_id, person, group):
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def remove_group(request, org_id, person, group):
     """
     删除分组
@@ -309,8 +309,8 @@ def remove_group(request, org_id, person, group):
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def add_person_group(request, org_id, user_id, person, group):
     """
     分组加人
@@ -339,8 +339,8 @@ def add_person_group(request, org_id, user_id, person, group):
 
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def remove_person_group(request, org_id, user_id, person, group):
     """
     分组加人
@@ -371,7 +371,7 @@ def remove_person_group(request, org_id, user_id, person, group):
                       email=("电子邮件", "email"), is_gaoguan=("是否高管", "b", False), is_show_tel=("是否显示手机号", "b", True),
                       is_show_email=("是否显示邮箱", "b", True))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def update_person_group(request, org_id, user_id, realname, title, email, is_gaoguan, is_show_tel, is_show_email,
                         person):
     """
@@ -409,8 +409,8 @@ def update_person_group(request, org_id, user_id, realname, title, email, is_gao
 @check_request_parmes(org_id=("组织id", "r,int"), group_id=("分组id", "r,int"), page_index=("页码", "int", 1),
                       page_size=("页长度", "int", 20))
 @client_login_required
-@check_org_relation
-@check_group
+@check_org_relation()
+@check_group()
 def query_member_by_group_list(request, org_id, group_id, page_index, page_size, person, group):
     """
     查询分组成员列表

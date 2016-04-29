@@ -124,7 +124,7 @@ def apply_organization(request, org_id, content):
 
 @check_request_parmes(org_id=("组织id", "r,int"), orgapply_id=("申请id", "r,int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def agree_organization(request, org_id, orgapply_id, person):
     """
     同意加入组织
@@ -166,7 +166,7 @@ def agree_organization(request, org_id, orgapply_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), orgapply_id=("申请id", "r,int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def reject_organization(request, org_id, orgapply_id, person):
     """
     拒绝加入组织
@@ -199,7 +199,7 @@ def reject_organization(request, org_id, orgapply_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def add_person_org(request, org_id, user_id, person):
     """
     把用户加入组织,无需申请
@@ -226,7 +226,7 @@ def add_person_org(request, org_id, user_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def remove_person_org(request, org_id, user_id, person):
     """
     把用户移出组织
@@ -253,7 +253,7 @@ def remove_person_org(request, org_id, user_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def add_manager_org(request, org_id, user_id, person):
     """
     添加管理员
@@ -282,7 +282,7 @@ def add_manager_org(request, org_id, user_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def remove_manager_org(request, org_id, user_id, person):
     """
     移除管理员
@@ -311,7 +311,7 @@ def remove_manager_org(request, org_id, user_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def transfer_manager_org(request, org_id, user_id, person):
     """
     添加新的超级管理员
@@ -341,7 +341,7 @@ def transfer_manager_org(request, org_id, user_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def create_org_headicon(request, org_id, nsfile_id, person):
     """
     上传组织头像

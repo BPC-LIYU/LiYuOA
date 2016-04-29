@@ -13,7 +13,7 @@ from util.loginrequired import check_request_parmes, client_login_required
 
 @check_request_parmes(org_id=("组织id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def query_appinfo_by_org_list(request, org_id, person, page_index, page_size):
     """
     查询组织的应用列表
@@ -32,7 +32,7 @@ def query_appinfo_by_org_list(request, org_id, person, page_index, page_size):
 
 @check_request_parmes(org_id=("组织id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
 @client_login_required
-@check_org_relation
+@check_org_relation()
 def query_not_used_appinfo_by_org_list(request, org_id, person, page_index, page_size):
     """
     查询组织的应用列表
@@ -51,7 +51,7 @@ def query_not_used_appinfo_by_org_list(request, org_id, person, page_index, page
 
 @check_request_parmes(org_id=("组织id", "r,int"), app_id=("应用id", "r,int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def add_appinfo(request, org_id, app_id, person):
     """
     添加应用到组织
@@ -76,7 +76,7 @@ def add_appinfo(request, org_id, app_id, person):
 
 @check_request_parmes(org_id=("组织id", "r,int"), app_id=("应用id", "r,int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def remove_appinfo(request, org_id, app_id, person):
     """
     从组织中删除应用
@@ -103,7 +103,7 @@ def remove_appinfo(request, org_id, app_id, person):
 @check_request_parmes(org_id=("组织id", "r,int"), app_id=("应用id", "r,int"), user_id=("用户id组", "r,int"),
                       role_id=("角色", "int"))
 @client_login_required
-@check_org_manager_relation
+@check_org_manager_relation()
 def make_appinfo_permission(request, org_id, app_id, user_id, role_id, person):
     """
     从组织中删除应用
