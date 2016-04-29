@@ -339,7 +339,7 @@ def transfer_manager_org(request, org_id, user_id, person):
         return get_result(False, u'用户不是该组织成员')
 
 
-@check_request_parmes(org_id=("组织id", "r,int"), user_id=("用户id", "r,int"))
+@check_request_parmes(org_id=("组织id", "r,int"), nsfile_id=("文件id", "r,int"))
 @client_login_required
 @check_org_manager_relation()
 def create_org_headicon(request, org_id, nsfile_id, person):
@@ -350,6 +350,8 @@ def create_org_headicon(request, org_id, nsfile_id, person):
     :param org_id:
     :param nsfile_id:
     :return:
+    添加文件id
+    by:王健 at:2016-04-29
     """
     orghead = OrgHeadIcon()
     orghead.org_id = org_id
