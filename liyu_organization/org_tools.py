@@ -85,6 +85,35 @@ def check_group(org_id_parm_name='org_id', group_id_parm_name='group_id'):
     return check_org_relation_func
 
 
+def check_person_group_permiss(person, group, h_level=False):
+    """
+    检查成员在分组的权限
+    :param person:
+    :param group:
+    :return:
+    """
+    if person.manage_type in [1, 2]:
+        return True
+    if group.parent_id is None:
+        if group.charge_id is not None:
+            if group.charge_id == person.id:
+                return True
+        if not h_level and group.aide_id is not None:
+            if group.aide_id == person.id:
+                return True
+    else:
+        if group.parent.charge_id is not None:
+            if group.parent.charge_id == person.id:
+                return True
+        if group.parent.aide_id is not None:
+            if group.parent.aide_id == person.id:
+                return True
+    return False
+
+
+
+
+
 def clean_organization_groups_cache(org_id):
     """
     清空缓存中的组织结构
@@ -192,6 +221,7 @@ def get_org_member_ids_by_manage_type(org_id, manage_type=[0, 1, 2]):
         if p['manage_type'] in manage_type:
             user_ids.append(k)
     return user_ids
+
 
 def org_commend(event, org_id, message, user_ids=None):
     """

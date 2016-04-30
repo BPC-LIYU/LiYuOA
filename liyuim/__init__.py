@@ -1,0 +1,1 @@
+IM_GROUPS_AND_MEMBERS = 'im_groups_and_members_%s'

@@ -51,17 +51,18 @@ class Person(BaseModel):
 
 class Group(BaseModel):
     """
-    分组
+    部门
     by:王健 at:2016-04-18
     """
     org = models.ForeignKey(Organization, verbose_name=u"隶属组织")
-    name = models.CharField(max_length=30, verbose_name=u'分组名称')
+    name = models.CharField(max_length=30, verbose_name=u'部门名称')
     icon_url = models.URLField(verbose_name=u'图标url', null=True)
-    members = models.ManyToManyField(Person, verbose_name=u'分组成员')
+    members = models.ManyToManyField(Person, verbose_name=u'部门成员')
     charge = models.ForeignKey(Person, related_name='group_charge', verbose_name=u'负责人', null=True)
     aide = models.ForeignKey(Person, related_name='group_aide', verbose_name=u'助手', null=True)
     sort = models.IntegerField(default=0, db_index=True, null=True, verbose_name=u'排序字段')
     parent = models.ForeignKey('Group', null=True, verbose_name=u'隶属关系')
+    talkgroup = models.ForeignKey('liyuim.TalkGroup', null=True, verbose_name=u'部门群')
 
     def save(self, **kwargs):
         super(Group, self).save(**kwargs)
@@ -134,7 +135,7 @@ class OrgHeadIcon(BaseModel):
     by:王健 at:2016-04-29
     """
     org = models.ForeignKey(Organization, verbose_name=u"隶属组织")
-    group = models.ForeignKey(Group, null=True, verbose_name=u'隶属分组')
+    group = models.ForeignKey(Group, null=True, verbose_name=u'隶属部门')
     nsfile = models.ForeignKey('nsbcs.NsFile', verbose_name=u'附件')
     person = models.ForeignKey(Person, verbose_name=u'上传者')
 

@@ -4,8 +4,10 @@
 # file: im_tools.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
+from liyuim import IM_GROUPS_AND_MEMBERS
 from liyuim.models import Friend, TalkUser
 from util.jsonresult import get_result
+from django.core.cache import cache
 
 
 def check_friend_relation(friend_id_parm_name='friend_id'):
@@ -53,3 +55,61 @@ def check_group_relation(group_id_parm_name='talkgroup_id'):
 
     return check_group_relation_func
 
+#
+# def clean_talk_groups_cache(group_id):
+#     """
+#     清空缓存中的组织结构
+#     :param org_id:
+#     :return:
+#     """
+#     cache_key = IM_GROUPS_AND_MEMBERS % group_id
+#     cache.delete(cache_key)
+#
+#
+# def get_talk_group_cache(group_id):
+#     """
+#     获取组织结构的缓存
+#     by:王健 at:2016-04-29
+#     :param group_id:
+#     :return:
+#     """
+#     cache_key = IM_GROUPS_AND_MEMBERS % group_id
+#
+#     result = cache.get(cache_key)
+#     if result is None:
+#         result = {}
+#         for person in TalkUser.objects.list_json().filter(talkgroup=group_id, is_active=True):
+#             result[person['user_id']] = person
+#
+#         cache.set(cache_key, result)
+#     return result
+#
+#
+# def get_talk_member_ids_by_role(group_id, role=[0, 1]):
+#     """
+#     获取组织的管理员id列表
+#     by:王健 at:2016-04-30
+#     :param org_id:
+#     :return:
+#     """
+#     result = get_talk_group_cache(group_id)
+#     user_ids = []
+#
+#     for k, p in result.items():
+#         if p['role'] in role:
+#             user_ids.append(k)
+#     return user_ids
+
+
+def im_commend(event, group_id, parms={}):
+    """
+    组织事件:
+    :param event:
+    :param org_id:
+    :param message:
+    :return:
+    """
+    # if user_ids is None:
+    #     user_ids = get_talk_member_ids_by_role(group_id)
+
+    im_commend("im", {"event": event, "group_id": group_id, "parms": parms})

@@ -7,7 +7,7 @@
 import hashlib
 import time
 
-from liyuim.im_tools import check_group_relation
+from liyuim.im_tools import check_group_relation, im_commend
 from liyuim.models import TalkGroup, TalkUser, TalkApply
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
@@ -60,22 +60,25 @@ def create_talkgroup(request, name, group_type, member_ids):
     创建群
     by:王健 at:2016-04-24
     """
-    member_ids.sort()
-    flag = hashlib.md5(','.join(member_ids)).hexdigest()
     talkgroup = TalkGroup()
     talkgroup.name = name
     talkgroup.group_type = group_type
-    talkgroup.flag = flag
+    talkgroup.flag = ''
     talkgroup.owner = request.user
     talkgroup.save()
 
     for uid in member_ids:
         talkuser = TalkUser()
+        talkuser.copy_old()
         talkuser.talkgroup = talkgroup
         talkuser.user_id = uid
         talkuser.role = 0
         talkuser.read_timeline = int(time.time())
         talkuser.save()
+        talkuser.push_im_event(request.user)
+    im_commend("im_group_change", talkgroup.id)
+    talkgroup.make_md5_flag()
+    talkgroup.save()
 
     return get_result(True, u'创建群成功', talkgroup)
 
@@ -136,6 +139,14 @@ def quite_talkgroup(request, talkgroup_id, talkuser):
     talkuser.is_active = False
     talkuser.compare_old()
     talkuser.save()
+    talkuser.push_im_event(request.user)
+    talkgroup = talkuser.talkgroup
+    talkgroup.copy_old()
+    talkgroup.make_md5_flag()
+    created, diff = talkgroup.compare_old()
+    if diff:
+        talkgroup.save()
+        im_commend("im_group_change", talkgroup.id)
     return get_result(True, u'退出群成功')
 
 
@@ -156,9 +167,11 @@ def dismiss_talkgroup(request, talkgroup_id, talkuser):
     talkgroup = talkuser.talkgroup
     talkgroup.copy_old()
     talkgroup.is_active = False
+    TalkUser.objects.filter(talkgroup_id=talkgroup_id, is_active=True).update(is_active=False)
+    talkgroup.make_md5_flag()
     talkgroup.compare_old()
     talkgroup.save()
-    TalkUser.objects.filter(talkgroup_id=talkgroup_id, is_active=True).update(is_active=False)
+
     return get_result(True, u'退出群成功')
 
 
@@ -183,6 +196,14 @@ def remove_talkgroup(request, talkgroup_id, user_id, talkuser):
     member.is_active = False
     member.compare_old()
     member.save()
+    member.push_im_event(request.user)
+    talkgroup = talkuser.talkgroup
+    talkgroup.copy_old()
+    talkgroup.make_md5_flag()
+    created, diff = talkgroup.compare_old()
+    if diff:
+        talkgroup.save()
+        im_commend("im_group_change", talkgroup.id)
     return get_result(True, u'踢出群成功')
 
 
@@ -210,6 +231,14 @@ def add_talkgroup(request, talkgroup_id, user_id, talkuser):
     member.is_muted = False
     member.compare_old()
     member.save()
+    member.push_im_event(request.user)
+    talkgroup = talkuser.talkgroup
+    talkgroup.copy_old()
+    talkgroup.make_md5_flag()
+    created, diff = talkgroup.compare_old()
+    if diff:
+        talkgroup.save()
+        im_commend("im_group_change", talkgroup.id)
     return get_result(True, u'踢出群成功')
 
 
@@ -240,7 +269,8 @@ def apply_talkgroup(request, talkgroup_id, content):
 
 @check_request_parmes(talkapply_id=("入群申请id", "r,int"))
 @client_login_required
-def pass_talkapply(request, talkapply_id):
+@check_group_relation()
+def pass_talkapply(request, talkapply_id, talkuser):
     """
     通过入群申请
     :param talkapply_id:
@@ -251,11 +281,27 @@ def pass_talkapply(request, talkapply_id):
     """
     try:
         talkapply = TalkApply.objects.get(pk=talkapply_id)
-        if talkapply.talkgroup.owner_id == request.user.id or TalkUser.objects.filter(user=request.user, is_active=True,
-                                                                                      role=1).exists():
+        if talkapply.talkgroup.owner_id == request.user.id or talkuser.role == 1:
             talkapply.status = 1
             talkapply.checker = request.user
             talkapply.save()
+
+            talkuser, created = TalkUser.objects.get_or_create(talkgroup_id=talkapply.talkgroup_id, user_id=talkapply.owner_id)
+            talkuser.copy_old()
+            talkuser.is_active = True
+            crea, diff = talkuser.compare_old()
+            if created or diff:
+                talkuser.save()
+                talkuser.push_im_event(request.user)
+
+            talkgroup = talkuser.talkgroup
+            talkgroup.copy_old()
+            talkgroup.make_md5_flag()
+            created, diff = talkgroup.compare_old()
+            if diff:
+                talkgroup.save()
+                im_commend("im_group_change", talkgroup.id)
+            return get_result(True, u'审批通过入群申请')
         else:
             return get_result(False, u'只有群主和管理员才能操作入群申请')
     except TalkApply.DoesNotExist:

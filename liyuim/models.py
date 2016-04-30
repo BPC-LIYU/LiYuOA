@@ -4,6 +4,7 @@
 # file: models.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
+import hashlib
 
 from django.conf import settings
 from django.db import models
@@ -80,6 +81,18 @@ class TalkGroup(BaseModel):
                      'icon_url', 'is_add']
         detail_json = ['create_time', 'is_active']
 
+    def make_md5_flag(self):
+        """
+        计算本群的md5值
+        by:王健 at:2016-04-30
+        :return:
+        """
+
+        self.flag = hashlib.md5(','.joins([str(x['user_id']) for x in
+                               TalkUser.objects.filter(talkgroup_id=self.id, is_active=True).values(
+                                   'user_id').order_by('user_id')])).hexdigest()
+
+
 
 class TalkUser(BaseModel):
     """
@@ -97,6 +110,18 @@ class TalkUser(BaseModel):
         list_json = ['id', 'talkgroup_id', 'user__realname', 'user__icon_url', 'nickname', 'role', 'is_muted',
                      'read_timeline']
         detail_json = ['create_time', 'is_active']
+
+    def push_im_event(self, douser):
+        created, diff = self.compare_old()
+        if created or diff.has_key('is_active'):
+            from im_tools import im_commend
+            parms = {"douser": douser.toJSON(), "user": self.user.toJSON()}
+            if created or (diff.has_key('is_active') and diff['is_active']):
+                im_commend("group_member_change_in", self.talkgroup_id, parms)
+            elif diff.has_key('is_active') and not diff['is_active']:
+                im_commend("group_member_change_out", self.talkgroup_id, parms)
+
+
 
 
 class TalkGongGao(BaseModel):
