@@ -178,6 +178,21 @@ def get_organization_groups(org_id, group_id=None):
     return obj
 
 
+def get_org_member_ids_by_manage_type(org_id, manage_type=[0, 1, 2]):
+    """
+    获取组织的管理员id列表
+    by:王健 at:2016-04-30
+    :param org_id:
+    :return:
+    """
+    result = get_organization_cache(org_id)
+    user_ids = []
+
+    for k, p in result['person'].items():
+        if p['manage_type'] in manage_type:
+            user_ids.append(k)
+    return user_ids
+
 def org_commend(event, org_id, message, user_ids=None):
     """
     组织事件:
@@ -187,6 +202,6 @@ def org_commend(event, org_id, message, user_ids=None):
     :return:
     """
     if user_ids is None:
-        result = get_organization_cache(org_id)
-        user_ids = result['person'].keys()
+        user_ids = get_org_member_ids_by_manage_type(org_id)
+
     im_commend("org", {"event": event, "org_id": org_id, "message": message, "user_ids": user_ids})

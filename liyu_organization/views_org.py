@@ -5,7 +5,8 @@
 # Email: wangjian2254@icloud.com
 # Author: 王健
 from liyu_organization.models import Organization, OrgApply, Person, OrgHeadIcon
-from liyu_organization.org_tools import check_org_relation, check_org_manager_relation, org_commend
+from liyu_organization.org_tools import check_org_relation, check_org_manager_relation, org_commend, \
+    get_org_member_ids_by_manage_type
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required
 
@@ -99,7 +100,7 @@ def update_organization(request, org_id, name, icon_url):
         created, diff = obj.compare_old()
         if diff:
             obj.save()
-            org_commend("update_organization", obj.id, None)
+            org_commend("update_organization", org_id, None)
         return get_result(True, None, obj)
     except Organization.DoesNotExist:
         return get_result(False, u'组织不存在')
@@ -122,6 +123,8 @@ def apply_organization(request, org_id, content):
     applyorg.org_id = org_id
     applyorg.content = content
     applyorg.save()
+    org_commend("apply_organization", org_id, u"%s 申请加入 %s" % (request.user.realname, applyorg.org.name),
+                get_org_member_ids_by_manage_type(org_id, [1, 2]))
 
     return get_result(True, u'已经发出申请,等待组织管理员审核', applyorg)
 
@@ -163,6 +166,11 @@ def agree_organization(request, org_id, orgapply_id, person):
         create, diff = member.compare_old()
         if diff:
             member.save()
+            member_ids = get_org_member_ids_by_manage_type(org_id)
+            member_ids.remove(apporg.user_id)
+            org_commend("agree_organization", org_id, u"您被批准加入 %s" %  apporg.org.name, [apporg.user_id])
+            org_commend("add_person_org", org_id, u"%s 加入 %s" % (apporg.user.realname, apporg.org.name), member_ids)
+
         return get_result(True, u'已同意用户的加入组织申请', apporg)
     except OrgApply.DoesNotExist:
         return get_result(False, u'这不是发给您的组织的申请,您不能处理')
@@ -196,6 +204,7 @@ def reject_organization(request, org_id, orgapply_id, person):
         apporg.status = 2
         apporg.compare_old()
         apporg.save()
+        org_commend("reject_organization", org_id, u"您被拒绝加入 %s" % apporg.org.name, [apporg.user_id])
         return get_result(True, u'已经绝用户的加入组织申请', apporg)
     except OrgApply.DoesNotExist:
         return get_result(False, u'这不是发给您的组织的申请,您不能处理')
@@ -224,6 +233,7 @@ def add_person_org(request, org_id, user_id, person):
     create, diff = member.compare_old()
     if diff:
         member.save()
+        org_commend("add_person_org", org_id, u"%s 加入 %s" % (member.realname, person.org.name), get_org_member_ids_by_manage_type(org_id))
 
     return get_result(True, u'成功将用户加入组织', member)
 
@@ -250,6 +260,9 @@ def remove_person_org(request, org_id, user_id, person):
         create, diff = member.compare_old()
         if diff:
             member.save()
+            org_commend("remove_person_org", org_id, u"%s 离开 %s" % (member.realname, person.org.name),
+                    get_org_member_ids_by_manage_type(org_id))
+            org_commend("remove_person_org", org_id, u"%s 将您移出 %s " % (person.realname, person.org.name), [user_id])
         return get_result(True, u'成功将用户移出组织', member)
     except Person.DoesNotExist:
         return get_result(False, u'用户不是该组织成员')
@@ -279,6 +292,7 @@ def add_manager_org(request, org_id, user_id, person):
         create, diff = member.compare_old()
         if diff:
             member.save()
+            org_commend("add_manager_org", org_id, u"%s 将您设置为 %s 管理员" % (person.realname, person.org.name), [user_id])
         return get_result(True, u'成功将用户设置成管理员', member)
     except Person.DoesNotExist:
         return get_result(False, u'用户不是该组织成员')
@@ -308,6 +322,7 @@ def remove_manager_org(request, org_id, user_id, person):
         create, diff = member.compare_old()
         if diff:
             member.save()
+            org_commend("remove_manager_org", org_id, u"%s 取消您 %s 管理员身份" % (person.realname, person.org.name), [user_id])
         return get_result(True, u'成功将用户设置成管理员', member)
     except Person.DoesNotExist:
         return get_result(False, u'用户不是该组织成员')
@@ -337,6 +352,10 @@ def transfer_manager_org(request, org_id, user_id, person):
         create, diff = member.compare_old()
         if diff:
             member.save()
+            org_commend("transfer_manager_org", org_id, u"%s 设置您为 %s 超级管理员身份" % (person.realname, person.org.name), [user_id])
+            member_ids = get_org_member_ids_by_manage_type(org_id, [1, 2])
+            member_ids.remove(user_id)
+            org_commend("transfer_manager_org", org_id, u"%s 设置 %s 为 %s 超级管理员" % (person.realname, member.realname, person.org.name), member_ids)
 
         return get_result(True, u'成功将用户设置成超级管理员', member)
     except Person.DoesNotExist:
@@ -365,4 +384,6 @@ def create_org_headicon(request, org_id, nsfile_id, person):
     orghead.org.icon_url = orghead.nsfile.get_thumbnail(orghead.nsfile.fileurl, orghead.nsfile.bucket,
                                                         orghead.nsfile.name, orghead.nsfile.filetype)
     orghead.org.save()
+    org_commend("create_org_headicon", org_id, None)
+
     return get_result(True, u'上传组织头像成功', orghead.org)
