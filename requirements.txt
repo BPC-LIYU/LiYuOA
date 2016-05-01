@@ -18,3 +18,4 @@ Pillow>=2.0.0
 coverage==3.5
 django-redis-sessions
 django-redis-cache
+grpcio
