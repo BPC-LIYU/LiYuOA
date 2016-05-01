@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 
+from liyuoa.models import LYUser
 from util.jsonresult import get_result
 from util.loginrequired import check_request_parmes, client_login_required, check_response_results
 from util.tools import getUserIconUrl
@@ -255,7 +256,8 @@ def send_sms_code(request, tel):
 @check_request_parmes()
 @check_response_results(date_joined=("加入时间", "datetime"), email=("电子邮件", ""), icon_url=("头像url", ""),
                         id=("用户id", "int"),
-                        imusername=("即时通信用户名", ""),impassword=("即时通信密码", ""), is_active=("是否可用", "int"), is_staff=("是否管理员", "int"),
+                        imusername=("即时通信用户名", ""), impassword=("即时通信密码", ""), is_active=("是否可用", "int"),
+                        is_staff=("是否管理员", "int"),
                         realname=("真实姓名", ""),
                         username=("用户名", ""))
 @client_login_required
@@ -269,6 +271,23 @@ def my_userinfo(request):
     """
     user = request.user.toJSON()
     return get_result(True, u'', user)
+
+
+@client_login_required
+@check_request_parmes(user_id=("用户id", "r,int"))
+def get_userinfo(request, user_id):
+    """
+    获取用户信息
+    :param request:
+    :return:
+    获取用户信息
+    by:范俊伟 at:2016-04-30
+    """
+    try:
+        user = LYUser.objects.get(id=user_id)
+    except:
+        return get_result(False, '', '不存在此用户')
+    return get_result(True, u'', user.toJSON())
 
 
 @check_request_parmes(color=("颜色", "r"), text=("文字", 'r'), width=("宽度", 'int'), height=("高度", 'int'))

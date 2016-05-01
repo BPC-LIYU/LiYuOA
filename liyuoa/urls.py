@@ -24,6 +24,7 @@ urlpatterns = patterns('liyuoa',
                        url('^qrcode_login_scan$', 'views_qrcode.qrcode_login_scan'),
                        url('^qrcode_login_string$', 'views_qrcode.qrcode_login_string'),
                        url('^my_userinfo$', 'views.my_userinfo'),
+                       url('^get_userinfo$', 'views.get_userinfo'),
                        # 头像
                        url('^text_icon$', 'views.text_icon'),
                        url('^user_icon$', 'views.user_icon'),
