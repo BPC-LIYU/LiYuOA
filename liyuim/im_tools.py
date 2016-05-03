@@ -104,13 +104,28 @@ def check_group_relation(group_id_parm_name='talkgroup_id'):
 
 def im_commend(event, group_id, parms={}):
     """
-    组织事件:
+    分组事件:
+    :param parms:
+    :param group_id:
     :param event:
-    :param org_id:
-    :param message:
     :return:
     """
     # if user_ids is None:
     #     user_ids = get_talk_member_ids_by_role(group_id)
 
-    mqtt_commend("im", {"event": event, "group_id": group_id, "parms": parms})
+    mqtt_commend("imgroup", {"event": event, "group_id": group_id, "parms": parms})
+
+
+def im_friend_commend(event, owner_id, friend_id, parms={}):
+    """
+    好友事件:
+    :param parms:
+    :param friend_id:
+    :param owner_id:
+    :param event:
+    :return:
+    """
+    # if user_ids is None:
+    #     user_ids = get_talk_member_ids_by_role(group_id)
+
+    mqtt_commend("imfriend", {"event": event, "owner_id": owner_id, "friend_id": friend_id, "parms": parms})
