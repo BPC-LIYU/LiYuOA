@@ -234,4 +234,4 @@ def org_commend(event, org_id, message, user_ids=None):
     if user_ids is None:
         user_ids = get_org_member_ids_by_manage_type(org_id)
 
-    mqtt_commend("org", {"event": event, "org_id": org_id, "message": message, "user_ids": user_ids})
+    mqtt_commend("org", {"event_type": event, "event_obj": {"org_id": org_id, "message": message, "user_ids": user_ids}})

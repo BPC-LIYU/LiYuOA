@@ -95,6 +95,8 @@ def create_group(request, org_id, group_id, charge_id, aide_id, is_create_talk_g
     by:王健 at:2016-04-27
     创建部门时可以提供主管 和 主管助理的参数
     by:王健 at:2016-04-29
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     group = None
     if group_id is None:
@@ -164,7 +166,7 @@ def create_group(request, org_id, group_id, charge_id, aide_id, is_create_talk_g
             imgroup.save()
             im_commend("im_group_change", imgroup.id)
 
-    org_commend("org_change", org_id, None)
+    org_commend("org_group_change", org_id, None)
     return get_result(True, u'创建部门成功', newgroup)
 
 
@@ -181,6 +183,8 @@ def update_group(request, org_id, group_id, name, icon_url, parent_id, person, g
     :return:
     修改部门的信息
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if not check_person_group_permiss(person, group):
         return get_result(False, u'只有管理员、部门主管、部门主管助手、父级部门主管、父级部门主管助手可以修改部门信息')
@@ -201,7 +205,7 @@ def update_group(request, org_id, group_id, name, icon_url, parent_id, person, g
 
     if diff:
         group.save()
-        org_commend("org_change", org_id, None)
+        org_commend("org_group_change", org_id, None)
 
     return get_result(True, u'修改部门信息成功', group)
 
@@ -218,6 +222,8 @@ def remove_charge_group(request, org_id, person, group):
     :return:
     删除部门主管
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if check_person_group_permiss(person, group):
         group.copy_old()
@@ -225,7 +231,7 @@ def remove_charge_group(request, org_id, person, group):
         created, diff = group.compare_old()
         if diff:
             group.save()
-            org_commend("org_change", org_id, None)
+            org_commend("org_group_change", org_id, None)
         return get_result(True, u'删除部门主管成功', group)
     else:
         return get_result(False, u'只有管理员、部门主管、部门主管助手、父级部门主管、父级部门主管助手可以修改部门信息')
@@ -243,6 +249,8 @@ def remove_aide_group(request, org_id, person, group):
     :return:
     删除部门主管
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if check_person_group_permiss(person, group):
         group.copy_old()
@@ -250,7 +258,7 @@ def remove_aide_group(request, org_id, person, group):
         created, diff = group.compare_old()
         if diff:
             group.save()
-            org_commend("org_change", org_id, None)
+            org_commend("org_group_change", org_id, None)
         return get_result(True, u'删除部门主管助手成功', group)
     else:
         return get_result(False, u'只有管理员、部门主管、部门主管助手、父级部门主管、父级部门主管助手可以修改部门信息')
@@ -268,6 +276,8 @@ def add_charge_group(request, org_id, group_id, user_id, person, group):
     :return:
     添加部门主管
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if check_person_group_permiss(person, group, True):
         group.copy_old()
@@ -278,7 +288,7 @@ def add_charge_group(request, org_id, group_id, user_id, person, group):
         created, diff = group.compare_old()
         if diff:
             group.save()
-            org_commend("org_change", org_id, None)
+            org_commend("org_group_change", org_id, None)
             if group.talkgroup_id is not None:
                 talkuser, created = TalkUser.objects.get_or_create(talkgroup_id=group.talkgroup_id, user_id=user_id)
                 talkuser.copy_old()
@@ -309,6 +319,8 @@ def add_aide_group(request, org_id, user_id, person, group):
     :return:
     删除部门主管
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if check_person_group_permiss(person, group):
 
@@ -320,7 +332,7 @@ def add_aide_group(request, org_id, user_id, person, group):
         created, diff = group.compare_old()
         if diff:
             group.save()
-            org_commend("org_change", org_id, None)
+            org_commend("org_group_change", org_id, None)
             if group.talkgroup_id is not None:
                 talkuser, created = TalkUser.objects.get_or_create(talkgroup_id=group.talkgroup_id, user_id=user_id)
                 talkuser.copy_old()
@@ -350,6 +362,8 @@ def remove_group(request, org_id, person, group):
     :return:
     删除部门
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if check_person_group_permiss(person, group, True):
 
@@ -360,7 +374,7 @@ def remove_group(request, org_id, person, group):
         created, diff = group.compare_old()
         if diff:
             group.save()
-            org_commend("org_change", org_id, None)
+            org_commend("org_group_change", org_id, None)
         return get_result(True, u'删除部门成功', group)
     else:
         return get_result(False, u'只有管理员、部门主管、父级部门主管、父级部门主管助手可以删除部门')
@@ -381,6 +395,8 @@ def add_person_group(request, org_id, user_id, person, group):
     :return:
     部门加人
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if check_person_group_permiss(person, group):
 
@@ -390,7 +406,7 @@ def add_person_group(request, org_id, user_id, person, group):
         except Person.DoesNotExist:
             return get_result(False, u'用户不是当前组织的成员,不能加入部门')
         clean_organization_groups_cache(org_id)
-        org_commend("org_change", org_id, None)
+        org_commend("org_group_change", org_id, None)
         if group.talkgroup_id:
             talkuser, created = TalkUser.objects.get_or_create(talkgroup_id=group.talkgroup_id, user_id=user_id)
             talkuser.copy_old()
@@ -420,6 +436,8 @@ def remove_person_group(request, org_id, user_id, person, group):
     :return:
     部门加人
     by:王健 at:2016-04-27
+    部门变动事件
+    by:王健 at:2016-05-03
     """
     if check_person_group_permiss(person, group):
 
@@ -439,7 +457,7 @@ def remove_person_group(request, org_id, user_id, person, group):
             if diff:
                 group.save()
             clean_organization_groups_cache(org_id)
-            org_commend("org_change", org_id, None)
+            org_commend("org_group_change", org_id, None)
             if group.talkgroup_id:
                 talkuser, created = TalkUser.objects.get_or_create(talkgroup_id=group.talkgroup_id, user_id=user_id)
                 talkuser.copy_old()
@@ -488,6 +506,7 @@ def update_person_group(request, org_id, user_id, realname, title, email, is_gao
             created, diff = member.compare_old()
             if diff:
                 member.save()
+                org_commend("org_group_change", org_id, None)
             return get_result(True, u'成员信息修改成功', member)
         except Person.DoesNotExist:
             return get_result(False, u'成员不存在')

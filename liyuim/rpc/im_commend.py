@@ -30,7 +30,7 @@ def init():
     stub = liyuim_pb2.beta_create_MqttCommend_stub(channel)
 
 
-def mqtt_commend(route, parms, is_sync=True):
+def mqtt_commend(route, parms, is_sync=False):
 
     commend = {'route': route, 'parms': parms}
     if is_sync:
@@ -40,7 +40,7 @@ def mqtt_commend(route, parms, is_sync=True):
 
         return result
     else:
-        feature = stub.CommendIm.future(liyuim_pb2.IMRequest(commend=json.dumps(commend)))
+        feature = stub.CommendIm.future(liyuim_pb2.IMRequest(commend=json.dumps(commend)), _TIMEOUT_SECONDS)
 
         return
 

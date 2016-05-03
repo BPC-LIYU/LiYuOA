@@ -4,7 +4,7 @@
 # file: views_friend.py
 # Email: wangjian2254@icloud.com
 # Author: 王健
-from liyuim.im_tools import check_friend_relation
+from liyuim.im_tools import check_friend_relation, im_friend_commend
 from liyuim.models import Friend, FriendApply
 from util.jsonresult import get_result
 from util.loginrequired import client_login_required, check_request_parmes
@@ -50,12 +50,15 @@ def apply_friend(request, user_id, content):
     :return:
     申请添加好友
     by:王健 at:2016-04-24
+    增加好友变动的事件
+    by:王健 at:2016-05-03
     """
     friend_apply = FriendApply()
     friend_apply.friend_id = user_id
     friend_apply.content = content
     friend_apply.owner = request.user
     friend_apply.save()
+    im_friend_commend("apply_friend", request.user.id, user_id, friend_apply.toJSON())
     return get_result(True, None, friend_apply)
 
 
@@ -69,6 +72,8 @@ def pass_friendapply(request, friendapply_id):
     :return:
     修改好友申请
     by:王健 at:2016-04-24
+    增加好友变动的事件
+    by:王健 at:2016-05-03
     """
     try:
         friendapply = FriendApply.objects.get(id=friendapply_id, owner=request.user, is_active=True)
@@ -84,6 +89,7 @@ def pass_friendapply(request, friendapply_id):
             if not created:
                 friend.is_active = True
             friend.save()
+            im_friend_commend("pass_friendapply", friendapply.owner_id, friendapply.friend_id, friendapply.toJSON())
             return get_result(True, u'好友申请处理成功', friendapply)
         else:
             return get_result(False, u'已经处理过的申请,不能再次处理', friendapply)
@@ -101,12 +107,14 @@ def add_friend(request, friend_id):
     :return:
     直接添加好友
     by:王健 at:2016-04-24
+    增加好友变动的事件
+    by:王健 at:2016-05-03
     """
     friend, created = Friend.objects.get_or_create(friend_id=friend_id, owner=request.user)
     if not created:
         friend.is_active = True
     friend.save()
-
+    im_friend_commend("add_friend", friend.owner_id, friend.friend_id, friend.toJSON())
     return get_result(True, u'添加好友成功')
 
 
@@ -120,6 +128,8 @@ def reject_friendapply(request, friendapply_id):
     :return:
     拒绝好友申请(删除)
     by:王健 at:2016-04-24
+    增加好友变动的事件
+    by:王健 at:2016-05-03
     """
     try:
         friendapply = FriendApply.objects.get(id=friendapply_id, owner=request.user, is_active=True)
@@ -127,6 +137,7 @@ def reject_friendapply(request, friendapply_id):
         friendapply.is_active = False
         friendapply.compare_old()
         friendapply.save()
+        im_friend_commend("reject_friendapply", friendapply.owner_id, friendapply.friend_id, friendapply.toJSON())
         return get_result(True, u'好友申请删除成功', friendapply)
     except FriendApply.DoesNotExist:
         return get_result(False, u'好友申请,不是发给您的,您无权处理')
@@ -143,12 +154,14 @@ def modefy_friend_nickname(request, friend_id, nickname, friend):
     :return:
     修改好友备注名称
     by:王健 at:2016-04-24
+    增加好友变动的事件
+    by:王健 at:2016-05-03
     """
-    friend = Friend.objects.get(friend_id=friend_id, owner=request.user, is_active=True)
     friend.copy_old()
     friend.nickname = nickname
     friend.compare_old()
     friend.save()
+    im_friend_commend("friend_change", friend.owner_id, friend.friend_id, friend.toJSON())
     return get_result(True, u'修改好友昵称成功', friend)
 
 
@@ -165,11 +178,14 @@ def mark_friend_black(request, friend_id, is_black, friend):
     :return:
     设置好友到黑名单
     by:王健 at:2016-04-24
+    增加好友变动的事件
+    by:王健 at:2016-05-03
     """
     friend.copy_old()
     friend.is_black = is_black
     friend.compare_old()
     friend.save()
+    im_friend_commend("friend_change", friend.owner_id, friend.friend_id, friend.toJSON())
     return get_result(True, u'修改好友昵称成功', friend)
 
 
@@ -186,10 +202,13 @@ def mark_friend_muted(request, friend_id, is_muted, friend):
     :return:
     设置好友免扰
     by:王健 at:2016-04-24
+    增加好友变动的事件
+    by:王健 at:2016-05-03
     """
     friend.copy_old()
     friend.is_muted = is_muted
     friend.compare_old()
+    im_friend_commend("friend_change", friend.owner_id, friend.friend_id, friend.toJSON())
     return get_result(True, u'修改好友昵称成功', friend)
 
 

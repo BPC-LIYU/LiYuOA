@@ -113,7 +113,7 @@ def im_commend(event, group_id, parms={}):
     # if user_ids is None:
     #     user_ids = get_talk_member_ids_by_role(group_id)
 
-    mqtt_commend("imgroup", {"event": event, "group_id": group_id, "parms": parms})
+    mqtt_commend("imgroup", {"event_type": event, "event_obj": { "group_id": group_id, "parms": parms}})
 
 
 def im_friend_commend(event, owner_id, friend_id, parms={}):
@@ -128,4 +128,4 @@ def im_friend_commend(event, owner_id, friend_id, parms={}):
     # if user_ids is None:
     #     user_ids = get_talk_member_ids_by_role(group_id)
 
-    mqtt_commend("imfriend", {"event": event, "owner_id": owner_id, "friend_id": friend_id, "parms": parms})
+    mqtt_commend("imfriend", {"event_type": event, "event_obj": { "owner_id": owner_id, "friend_id": friend_id, "parms": parms}})
