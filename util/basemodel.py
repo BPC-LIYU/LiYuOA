@@ -217,7 +217,7 @@ class BaseModel(models.Model, JSONBaseMixin, ModefyMixin):
 
     def __unicode__(self):
         if hasattr(self, 'name'):
-            return u'$s#%s' % (self.pk, self.name)
+            return u'%s#%s' % (self.pk, self.name)
         else:
             raise Exception(u'需要重载 __unicode__ 函数')
 

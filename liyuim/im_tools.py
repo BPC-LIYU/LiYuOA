@@ -6,6 +6,7 @@
 # Author: 王健
 from liyuim import IM_GROUPS_AND_MEMBERS
 from liyuim.models import Friend, TalkUser
+from liyuim.rpc.im_commend import mqtt_commend
 from util.jsonresult import get_result
 from django.core.cache import cache
 
@@ -112,4 +113,4 @@ def im_commend(event, group_id, parms={}):
     # if user_ids is None:
     #     user_ids = get_talk_member_ids_by_role(group_id)
 
-    im_commend("im", {"event": event, "group_id": group_id, "parms": parms})
+    mqtt_commend("im", {"event": event, "group_id": group_id, "parms": parms})

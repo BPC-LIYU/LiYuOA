@@ -30,11 +30,11 @@ def init():
     stub = liyuim_pb2.beta_create_MqttCommend_stub(channel)
 
 
-def im_commend(route, parms, is_sync=True):
+def mqtt_commend(route, parms, is_sync=True):
 
     commend = {'route': route, 'parms': parms}
     if is_sync:
-        response = stub.CommendIm(liyuim_pb2.IMRequest(commend=json.dumps(commend)))
+        response = stub.CommendIm(liyuim_pb2.IMRequest(commend=json.dumps(commend)), _TIMEOUT_SECONDS)
 
         result = json.loads(response.result)
 

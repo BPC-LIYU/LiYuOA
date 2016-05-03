@@ -8,7 +8,7 @@ from django.core.cache import cache
 
 from liyu_organization import ORGANIZATION_GROUPS_AND_MEMBERS
 from liyu_organization.models import Person, Group
-from liyuim.rpc.im_commend import im_commend
+from liyuim.rpc.im_commend import mqtt_commend
 from util.jsonresult import get_result
 
 
@@ -234,4 +234,4 @@ def org_commend(event, org_id, message, user_ids=None):
     if user_ids is None:
         user_ids = get_org_member_ids_by_manage_type(org_id)
 
-    im_commend("org", {"event": event, "org_id": org_id, "message": message, "user_ids": user_ids})
+    mqtt_commend("org", {"event": event, "org_id": org_id, "message": message, "user_ids": user_ids})

@@ -46,7 +46,7 @@ class Person(BaseModel):
                        'is_show_email']
 
     def __unicode__(self):
-        return u'$s#%s' % (self.pk, self.realname)
+        return u'%s#%s' % (self.pk, self.realname)
 
 
 class Group(BaseModel):
