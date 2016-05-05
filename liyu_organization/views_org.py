@@ -8,6 +8,7 @@ from liyu_organization.models import Organization, OrgApply, Person, OrgHeadIcon
 from liyu_organization.org_tools import check_org_relation, check_org_manager_relation, org_commend, \
     get_org_member_ids_by_manage_type
 from util.jsonresult import get_result
+from django.shortcuts import render
 from util.loginrequired import check_request_parmes, client_login_required
 
 
@@ -31,7 +32,7 @@ def query_my_org_list(request, page_index, page_size):
 
 
 @check_request_parmes(org_id=("组织id", "r,int"))
-@client_login_required
+# @client_login_required
 def get_organization(request, org_id):
     """
     查询组织信息信息
@@ -127,6 +128,25 @@ def apply_organization(request, org_id, content):
                 get_org_member_ids_by_manage_type(org_id, [1, 2]))
 
     return get_result(True, u'已经发出申请,等待组织管理员审核', applyorg)
+
+
+@check_request_parmes(org_id=("组织id", "r,int"), page_index=("页码", "int", 1), page_size=("页长度", "int", 20))
+@client_login_required
+@check_org_manager_relation()
+def query_apply_organization_list(request, org_id, page_index, page_size, person):
+    """
+    申请加入组织
+    :param page_size:
+    :param page_index:
+    :param request:
+    :param org_id:
+    :return:
+    申请加入组织
+    by:王健 at:2016-04-26
+    """
+    orgapply_query = OrgApply.objects.list_json().filter(org_id=org_id, is_active=True, status=0)
+
+    return get_result(True, None, orgapply_query.get_page(page_index, page_size))
 
 
 @check_request_parmes(org_id=("组织id", "r,int"), orgapply_id=("申请id", "r,int"))

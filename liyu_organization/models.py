@@ -88,7 +88,7 @@ class OrgApply(BaseModel):
     status = models.IntegerField(default=0, db_index=True, verbose_name=u'状态', help_text=u'0:未处理,1:同意,2:拒绝')
 
     class Meta:
-        list_json = ['user__realname', 'user__icon_url', 'id', 'org_id', 'status', 'content']
+        list_json = ['user__realname', 'user__icon_url', 'user_id', 'id', 'org_id', 'status', 'content']
         detail_json = ['org__name', 'create_time', 'is_active', 'checker_id', 'checker__user_id',
                        'checker__user__icon_url', 'checker__realname']
 

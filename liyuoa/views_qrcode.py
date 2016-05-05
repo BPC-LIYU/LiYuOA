@@ -7,6 +7,7 @@
 from urllib import urlencode
 
 from django import http
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.core.cache import cache
@@ -106,7 +107,7 @@ def qrcode_login_string(request):
 
 
 @check_request_parmes(p=("扫码值", 'r'))
-def qrcode_view2(request, p):
+def qrcode2(request, p):
     """
     二维码处理函数 v2
     p 以|分割的函数
@@ -144,7 +145,7 @@ def qrcode_view2(request, p):
         if len(args) != 2:
             return http.HttpResponse('len error')
         code = args[1]
-        url = 'http://www.ddbuild.cn'
+        url = '%s#/join_org?org_id=%s' % (settings.WEB_URL, args[1])
         return http.HttpResponseRedirect(url)
     else:
         str = "未知action:%s" % action

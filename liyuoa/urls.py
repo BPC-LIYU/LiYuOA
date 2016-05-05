@@ -23,6 +23,7 @@ urlpatterns = patterns('liyuoa',
                        url('^qrcode_login_check$', 'views_qrcode.qrcode_login_check'),
                        url('^qrcode_login_scan$', 'views_qrcode.qrcode_login_scan'),
                        url('^qrcode_login_string$', 'views_qrcode.qrcode_login_string'),
+                       url('^qrcode2$', 'views_qrcode.qrcode2'),
                        url('^my_userinfo$', 'views.my_userinfo'),
                        url('^get_userinfo$', 'views.get_userinfo'),
                        # 头像
