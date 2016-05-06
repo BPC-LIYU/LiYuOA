@@ -180,6 +180,8 @@ def agree_organization(request, org_id, orgapply_id, person):
         apporg.compare_old()
         apporg.save()
         member, created = Person.objects.get_or_create(user_id=apporg.user_id, org_id=org_id)
+        if not created and member.is_active:
+            return get_result(False, u'用户已经是组织成员了, 无需审批申请')
         member.copy_old()
         member.realname = apporg.user.realname
         member.email = apporg.user.email

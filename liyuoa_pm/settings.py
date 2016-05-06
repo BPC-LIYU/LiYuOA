@@ -178,6 +178,8 @@ QN_PRIVATE_BUCKET = 'liyuoa-pri'
 
 HOST_URL = '0.0.0.0:8001'
 
+WEB_URL = 'http://localhost:63345/angular_desktop/www/index.html'
+
 NEED_MONGODB_HOST="mongodb://0.0.0.0:27017/liyuim?"
 
 
